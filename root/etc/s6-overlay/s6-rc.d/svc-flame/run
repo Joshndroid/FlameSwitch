@@ -2,7 +2,5 @@
 # shellcheck shell=bash
 mkdir -p /app/data /app/log
 chown -R abc:abc /app/data /app/log /app/public
-exec \
-    s6-notifyoncheck -d -n 300 -w 1000 \
-    cd /app s6-setuidgid abc \
-    node /app/server.js
+cd /app
+exec s6-setuidgid abc node server.js
