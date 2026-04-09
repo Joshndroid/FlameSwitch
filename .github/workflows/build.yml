@@ -16,11 +16,41 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set version from tag
         run: |
-          VERSION=${GITHUB_REF#refs/tags/switch-}
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/switch-}
+          else
+            VERSION="dev"
+          fi
           sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" package.json
+
+      - name: Generate changelog
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/switch-}
+            PREV_TAG=$(git tag --sort=-version:refname | grep '^switch-' | sed -n '2p')
+
+            if [ -n "$PREV_TAG" ]; then
+              COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s" --no-merges)
+            else
+              COMMITS=$(git log --pretty=format:"- %s" --no-merges | head -20)
+            fi
+
+            DATE=$(date +%Y-%m-%d)
+            NEW_ENTRY="### v${VERSION} (${DATE})\n${COMMITS}\n"
+
+            if [ -f CHANGELOG.md ]; then
+              echo -e "${NEW_ENTRY}\n$(cat CHANGELOG.md)" > CHANGELOG.md
+            else
+              echo -e "${NEW_ENTRY}" > CHANGELOG.md
+            fi
+          else
+            echo "Skipping changelog generation for manual dispatch"
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
