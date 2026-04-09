@@ -1,3 +1,7 @@
+### v0.38 (2026-04-09)
+- Add custom flame icon and update gitignore to track public/icons
+- chore: bump version to 0.37
+
 ### v0.37 (2026-04-09)
 - Icons: Lets get something more flashy
 - chore: bump version to 0.36
