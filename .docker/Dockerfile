@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Server deps
 COPY package*.json ./
-RUN npm install -g npm@latest && npm install --production
+RUN npm install --production
 
 # Client deps + build
 WORKDIR /app/client
