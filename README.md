@@ -2,13 +2,17 @@
 
 ![Homescreen screenshot](.github/home.png)
 
-## Abstract
+## Abstract-Joshndroid Me :)
+
+I had been using the original (pawelmalak/flame) for a long time and only recently decided to have a look if there was any updates. I was little saddened to see that it was basically abandoned as outlined in the abstract below. I went to update to the Spiicy one that I eventually forked but while it had updated some thing and added some spice, it still appeared to be a tad buggy. I ended up needing to nuke it as while it 'worked,' I couldn't update anything. My aim was to run this on Unraid and it is a bit of a pain with the generation of folders/permissions at time. I recognise that LinuxServer.io are masters at getting these things working on Unraid with minimal effort. I wanted to channel their awesome base images and rebase the whole thing along with going through security issues, dependancy issues and try get this thing updated as much as possible. I have also seen some fixes across some of the forks from the spiicy fork so i have tried to jump on these. I am definitely using AI to assist in doing some things, I am no coding savant and typically just know enough to get by.
+
+## Abstract-Spiicy (where I forked)
 
 _I am not the creator of Flame but I do want to keep it alive if only for my use.  In order to keep it alive, being the original dev has not updated since 2023, security patches and updates need to be applied.  This "master" branch is just "Legacy" Flame  {`docker pull ghcr.io/spiicytuna/flame:latest`}  with security updates and patches => so a fork + security => build => post here for others to use.  If you want to get spiicy (pun intended haha) [tuna-combo](https://github.com/spiicytuna/flame/tree/tuna-combo)  {`git pull ghcr.io/spiicytuna/flame-dev:latest`}  has customization that I have applied for my own use cases e.g. categories for the Application section, weather forecasts, etc._
 
 ## Description
 
-Flame is self-hosted startpage for your server. This is a direct fork from [pawelmalak](https://github.com/pawelmalak/flame) with [secutity updates](https://github.com/spiicytuna/flame/commit/a8559b4e509e00e33f3947b5e9495c4e90759e6f) applied and built-in [healthcheck](https://github.com/spiicytuna/flame/commit/a02bf19f39a58c266825f0727e5ef21a7f953451) path (oh and not important but fun, heh, [updated mdi icons](https://github.com/spiicytuna/flame/commit/c9f11816d9c84379fac16dd589d178fae6cb81e4)). 
+Flame is self-hosted startpage for your server. This is a direct fork from [pawelmalak](https://github.com/pawelmalak/flame) with [secutity updates](https://github.com/spiicytuna/flame/commit/a8559b4e509e00e33f3947b5e9495c4e90759e6f) applied and built-in [healthcheck](https://github.com/spiicytuna/flame/commit/a02bf19f39a58c266825f0727e5ef21a7f953451) path (oh and not important but fun, heh, [updated mdi icons](https://github.com/spiicytuna/flame/commit/c9f11816d9c84379fac16dd589d178fae6cb81e4)).
 
 Flame is very easy to setup and use. With built-in editors, it allows you to setup your very own application hub in no time - no file editing necessary.
 
@@ -28,7 +32,7 @@ Flame is very easy to setup and use. With built-in editors, it allows you to set
 
 ```sh
 # built with multiarch support
-docker pull ghcr.io/spiicytuna/flame:stable
+docker pull ghcr.io/joshndroid/flame-switch:latest
 
 ```
 
@@ -36,13 +40,13 @@ docker pull ghcr.io/spiicytuna/flame:stable
 
 ```sh
 # run container
-docker run -p 5005:5005 -v /path/to/data:/app/data -e PASSWORD=flame_password spiicytuna/flame
+docker run -p 5005:5005 -v /path/to/data:/app/data -e PASSWORD=flame_password joshndroid/flame
 ```
 
 #### Building images
 
 ```sh
-git clone https://github.com/spiicytuna/flame
+git clone https://github.com/joshndroid/flame
 
 cd flame
 
@@ -51,10 +55,10 @@ git checkout master
 # build multiarch image for amd64, armv7 and arm64
 # building failed multiple times with 2GB memory usage limit so you might want to increase it
 docker buildx build \
-  --platform linux/arm/v7,linux/arm64,linux/amd64 \
+  --platform linux/arm64,linux/amd64 \
   -f .docker/Dockerfile.multiarch \
-  -t ghcr.io/spiicytuna/flame:master \
-  . 
+  -t ghcr.io/joshndroid/flame:switch \
+  .
 ```
 
 #### Docker-Compose
