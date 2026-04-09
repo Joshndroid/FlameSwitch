@@ -27,8 +27,17 @@ export const weatherSettingsTemplate: WeatherForm = {
   lat: 0,
   long: 0,
   isCelsius: true,
-  weatherData: 'cloud',
+  weatherData: 'humidity',
+  weatherMode: 'geoip',
+  weatherWidgetIcon: 65,
+  showExtraWeatherColumn: false,
+  extraWeatherTop: 'uv',
+  extraWeatherBottom: 'gust_mph',
+  forecastEnable: false,
+  forecastDays: 3,
+  forecastCache: false,
 };
+
 
 export const generalSettingsTemplate: GeneralForm = {
   searchSameTab: false,

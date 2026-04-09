@@ -1,39 +1,27 @@
 const schedule = require('node-schedule');
-const getExternalWeather = require('./getExternalWeather');
-const clearWeatherData = require('./clearWeatherData');
-const Sockets = require('../Sockets');
 const Logger = require('./Logger');
-const loadConfig = require('./loadConfig');
+const { clearWeatherCache } = require('./weather');
 const logger = new Logger();
 
+let hours = parseInt(process.env.WEATHER_CACHE_HOURS || '1', 10);
+
+// Warn and cap if invalid
+if (isNaN(hours) || hours < 1) {
+  logger.log(`[WARN] WEATHER_CACHE_HOURS must be a positive number. Defaulting to 1.`, 'WARN');
+  hours = 1;
+} else if (hours >= 24) {
+  logger.log(`[WARN] WEATHER_CACHE_HOURS=${hours} is too high for cron (max 23). Capping to 23 hours.`, 'WARN');
+  hours = 23;
+}
+
+const interval = `0 */${hours} * * *`;
+
 module.exports = async function () {
-  const { WEATHER_API_KEY } = await loadConfig();
+  // output => weather cache time
+  logger.log(`[Weather] Cache is set to ${hours} hour(s). Can be changed with WEATHER_CACHE_HOURS=`);
 
-  if (WEATHER_API_KEY != '') {
-    // Update weather data every 15 minutes
-    const weatherJob = schedule.scheduleJob(
-      'updateWeather',
-      '0 */15 * * * *',
-      async () => {
-        try {
-          const weatherData = await getExternalWeather();
-
-          Sockets.getSocket('weather').socket.send(JSON.stringify(weatherData));
-        } catch (err) {
-          if (WEATHER_API_KEY) {
-            logger.log(err.message, 'ERROR');
-          }
-        }
-      }
-    );
-
-    // Clear old weather data every 4 hours
-    const weatherCleanerJob = schedule.scheduleJob(
-      'clearWeather',
-      '0 5 */4 * * *',
-      async () => {
-        clearWeatherData();
-      }
-    );
-  }
-};
+  schedule.scheduleJob('updateWeather', interval, () => {
+    logger.log(`[INFO] Weather cache cleared every ${hours}h and will be recreated on next page load. (cron interval: "${interval}")`);
+    clearWeatherCache();
+  });
+}
