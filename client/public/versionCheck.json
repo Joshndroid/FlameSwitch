@@ -1,8 +1,7 @@
 {
-  "owner": "spiicytuna",
+  "owner": "joshndroid",
   "repo": "flame",
   "branches": {
-    "stable": "master",
-    "dev": "tuna-combo"
+    "stable": "switch"
   }
 }
