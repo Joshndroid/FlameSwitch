@@ -1,15 +1,12 @@
 name: Build and Push to GHCR
-
 on:
   push:
     tags:
       - 'switch-*'
   workflow_dispatch:
-
 permissions:
   contents: write
   packages: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,16 +31,13 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             VERSION=${GITHUB_REF#refs/tags/switch-}
             PREV_TAG=$(git tag --sort=-version:refname | grep '^switch-' | sed -n '2p')
-
             if [ -n "$PREV_TAG" ]; then
               COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s" --no-merges)
             else
               COMMITS=$(git log --pretty=format:"- %s" --no-merges | head -20)
             fi
-
             DATE=$(date +%Y-%m-%d)
             NEW_ENTRY="### v${VERSION} (${DATE})\n${COMMITS}\n"
-
             if [ -f CHANGELOG.md ]; then
               echo -e "${NEW_ENTRY}\n$(cat CHANGELOG.md)" > CHANGELOG.md
             else
@@ -51,6 +45,16 @@ jobs:
             fi
           else
             echo "Skipping changelog generation for manual dispatch"
+          fi
+
+      - name: Commit version and changelog
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add package.json CHANGELOG.md
+            git diff --staged --quiet || git commit -m "chore: bump version to ${GITHUB_REF#refs/tags/switch-}"
+            git push origin switch
           fi
 
       - name: Set up QEMU

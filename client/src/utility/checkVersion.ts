@@ -87,11 +87,9 @@ export async function checkVersion(
 ): Promise<VersionStatus> {
   const { name: pkgName, version: localVersionMaybe, owner, repo, branches } = await getLocalAppInfo();
 
-  // hardcode spiicytuna => override versionCheck.json
-  const ownerRepo = `${owner || 'spiicytuna'}/${repo || 'flame'}`;
-  const branch = (pkgName === 'flame-dev')
-    ? (branches?.dev || 'tuna-combo')
-    : (branches?.stable || 'master');
+  // hardcode joshndroid => override versionCheck.json
+  const ownerRepo = `${owner || 'joshndroid'}/${repo || 'flame'}`;
+  const branch = branches?.stable || 'switch';
 
   const defaults = {
     defaultUrl:  `https://raw.githubusercontent.com/${ownerRepo}/${branch}/package.json`,
