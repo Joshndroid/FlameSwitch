@@ -1,4 +1,5 @@
 #!/bin/sh
 mkdir -p /app/data /app/log
 chown -R abc:abc /app/data /app/log /app/public
+cd /app
 exec s6-setuidgid abc node /app/server.js
