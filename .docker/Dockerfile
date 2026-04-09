@@ -2,6 +2,9 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
+#Turn off Update Notifier as latest errors out
+ENV NPM_CONFIG_UPDATE_NOTIFIER=false
+
 # Server deps
 COPY package*.json ./
 RUN npm install --production
