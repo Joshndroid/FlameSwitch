@@ -1,3 +1,6 @@
+### v0.34 (2026-04-09)
+- Build: fix error
+
 ### v0.30 (2026-04-09)
 - Add auto version and changelog generation from git tags
 
@@ -100,4 +103,3 @@
 - Added redux. Moved theme loading/setting to redux actions. Added automatic theme loading based on localStorage value.
 - Theme changing. Simple routing
 - Initial commit
-
