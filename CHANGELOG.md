@@ -1,3 +1,6 @@
+### v0.36 (2026-04-09)
+- chore: bump version to 0.34
+
 ### v0.34 (2026-04-09)
 - Build: fix error
 
