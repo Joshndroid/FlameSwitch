@@ -1,43 +1,36 @@
+# ---- Build Stage ----
 FROM node:22-alpine AS builder
-
 WORKDIR /app
 
-# --- Server Deps ---
+# Server deps
 COPY package*.json ./
 RUN npm install --production
 
-# --- Install+Build Deps ---
+# Client deps + build
 WORKDIR /app/client
 COPY ./client/package*.json ./
 RUN npm install
 COPY ./client/ ./
 RUN npm run build
 
-# --- Final Files ---
+# Final files
 WORKDIR /app
 COPY . .
 RUN mkdir -p ./public && mv ./client/dist/* ./public
-# Clean up the client source code
 RUN rm -rf ./client
 
 # ---- Final Stage ----
-FROM node:22-alpine
+FROM lscr.io/linuxserver/baseimage-alpine:3.22
 
-WORKDIR /app
-
-# Copy app from build
-COPY --from=builder /app /app
-
-# runtime OS deps
-RUN apk add --no-cache curl jq sqlite
+# Install node and runtime deps
+RUN apk add --no-cache nodejs curl jq sqlite
 
 ENV NODE_ENV=production
 
-RUN mkdir -p /app/data /app/log \
-    && chown -R node:node /app/data /app/log /app/public
+# Copy built app from builder
+COPY --from=builder /app /app
 
-USER node
+# Copy s6 service definitions
+COPY root/ /
 
 EXPOSE 5005
-
-CMD ["node", "server.js"]
