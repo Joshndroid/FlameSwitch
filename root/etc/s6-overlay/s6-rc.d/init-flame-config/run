@@ -1,4 +1,0 @@
-#!/bin/sh
-mkdir -p /app/data /app/log
-chown -R abc:abc /app/data /app/log /app/public
-exec s6-svscanctl -O /var/run/service/init-flame-config
