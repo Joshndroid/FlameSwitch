@@ -7,13 +7,13 @@
 I had been using the original (pawelmalak/flame) for a long time and only recently decided to have a look if there was any updates. I was little saddened to see that it was basically abandoned as outlined in the abstract below. I went to update to the Spiicy one that I eventually forked but while it had updated some things and added some spice, it still appeared to be a tad buggy. I ended up needing to nuke my install it as while it 'worked,' I couldn't update anything. My aim was to run this on Unraid and it is a bit of a pain with the generation of folders/permissions at time. I recognise that LinuxServer.io are masters at getting these things working on Unraid with minimal effort. I wanted to channel their awesome base images and rebase the whole thing along with going through security issues, dependancy issues and try get this thing updated as much as possible. I have also seen some fixes across some of the forks from the spiicy fork so i have tried to jump on these. I am definitely using AI to assist in doing some things, I am no coding savant and typically just know enough to get by.
 
 Switch Branch Changes over spiicytuna/master
-• Modern refreshed UI typography with updated font stack
-• Unraid‑optimized container built on LinuxServer.io‑style base image
-• s6‑overlay powered runtime for reliable service supervision
-• Multi‑architecture Docker images (amd64 + arm64)
-• Stability‑focused fork with merged fixes from multiple upstreams
-• Updated dependencies and security patches
-• Drop‑in compatible with classic Flame configs and themes
+- Modern refreshed UI typography with updated font stack
+- Unraid‑optimized container built on LinuxServer.io‑style base image
+- s6‑overlay powered runtime for reliable service supervision
+- Multi‑architecture Docker images (amd64 + arm64)
+- Stability‑focused fork with merged fixes from multiple upstreams
+- Updated dependencies and security patches
+- Drop‑in compatible with classic Flame configs and themes
 
 ## Abstract-Spiicy (where I forked)
 
