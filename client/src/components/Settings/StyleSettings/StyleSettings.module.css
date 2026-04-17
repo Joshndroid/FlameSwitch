@@ -1,0 +1,51 @@
+.FontHint {
+  margin-bottom: 15px;
+  color: var(--color-primary);
+}
+
+.FontHintToggle,
+.FontHintAction {
+  padding: 8px 15px;
+  border: 1px solid var(--color-accent);
+  background-color: var(--color-background);
+  color: var(--color-primary);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.FontHintToggle:hover,
+.FontHintAction:hover {
+  cursor: pointer;
+  background-color: var(--color-accent);
+  color: var(--color-background);
+}
+
+.FontHintContent {
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 3px solid var(--color-accent);
+}
+
+.FontHintContent p,
+.FontHintContent ul,
+.FontHintCode {
+  margin-bottom: 10px;
+}
+
+.FontHintContent ul {
+  padding-left: 18px;
+}
+
+.FontHintContent li {
+  margin-bottom: 5px;
+}
+
+.FontHintCode {
+  overflow-x: auto;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  font-size: 12px;
+  line-height: 1.4;
+}
