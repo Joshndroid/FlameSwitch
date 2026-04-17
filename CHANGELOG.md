@@ -1,3 +1,10 @@
+### v0.39 (2026-04-17)
+- Add font hint UI and template to StyleSettings
+- Bump the npm_and_yarn group across 2 directories with 1 update
+- Update README.md
+- Update README.md
+- chore: bump version to 0.38
+
 ### v0.38 (2026-04-09)
 - Add custom flame icon and update gitignore to track public/icons
 - chore: bump version to 0.37
