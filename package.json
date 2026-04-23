@@ -1,6 +1,6 @@
 {
   "name": "flame",
-  "version": "0.39",
+  "version": "1.0",
   "description": "Self-hosted start page",
   "main": "index.js",
   "scripts": {

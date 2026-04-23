@@ -1,3 +1,7 @@
+### v1.0 (2026-04-23)
+- Add built-in themes and sync during init
+- chore: bump version to 0.39
+
 ### v0.39 (2026-04-17)
 - Add font hint UI and template to StyleSettings
 - Bump the npm_and_yarn group across 2 directories with 1 update
