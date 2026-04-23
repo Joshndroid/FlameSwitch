@@ -143,6 +143,33 @@
         "accent": "#50fbc2"
       },
       "isCustom": false
+    },
+    {
+      "name": "ios-light",
+      "colors": {
+        "background": "#F2F2F7",
+        "primary": "#000000",
+        "accent": "#007AFF"
+      },
+      "isCustom": false
+    },
+    {
+      "name": "ios-dark",
+      "colors": {
+        "background": "#000000",
+        "primary": "#FFFFFF",
+        "accent": "#0A84FF"
+      },
+      "isCustom": false
+    },
+    {
+      "name": "matrix",
+      "colors": {
+        "background": "#000000",
+        "primary": "#00FF41",
+        "accent": "#008F11"
+      },
+      "isCustom": false
     }
   ]
 }
