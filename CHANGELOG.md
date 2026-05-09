@@ -1,3 +1,8 @@
+### v1.1 (2026-05-09)
+- Bump the npm_and_yarn group across 2 directories with 2 updates
+- Bump ip-address in the npm_and_yarn group across 1 directory
+- chore: bump version to 1.0
+
 ### v1.0 (2026-04-23)
 - Add built-in themes and sync during init
 - chore: bump version to 0.39
