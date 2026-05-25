@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 // Redux
@@ -56,6 +56,35 @@ export const Home = (): JSX.Element => {
     null | Category[]
   >(null);
 
+  const visibleApps = useMemo(
+    () => apps.filter(({ isPublic }) => isPublic),
+    [apps]
+  );
+
+  const visibleCategories = useMemo(
+    () =>
+      categories
+        .filter(({ isPublic }) => isPublic)
+        .map((category) => ({
+          ...category,
+          bookmarks: category.bookmarks.filter(({ isPublic }) => isPublic),
+        })),
+    [categories]
+  );
+
+  const pinnedVisibleApps = useMemo(
+    () => visibleApps.filter(({ isPinned }) => isPinned),
+    [visibleApps]
+  );
+
+  const pinnedVisibleCategories = useMemo(
+    () =>
+      visibleCategories.filter(
+        ({ isPinned, bookmarks }) => isPinned && bookmarks.length
+      ),
+    [visibleCategories]
+  );
+
   // Load applications
   useEffect(() => {
     if (!apps.length) {
@@ -111,7 +140,7 @@ export const Home = (): JSX.Element => {
     if (localSearch) {
       // Search through apps
       setAppSearchResult([
-        ...apps.filter(({ name, description }) =>
+        ...visibleApps.filter(({ name, description }) =>
           new RegExp(escapeRegex(localSearch), 'i').test(
             `${name} ${description}`
           )
@@ -119,22 +148,30 @@ export const Home = (): JSX.Element => {
       ]);
 
       // Search through bookmarks
-      const category = { ...categories[0] };
-
-      category.name = 'Search Results';
-      category.bookmarks = categories
+      const bookmarks = visibleCategories
         .map(({ bookmarks }) => bookmarks)
         .flat()
         .filter(({ name }) =>
           new RegExp(escapeRegex(localSearch), 'i').test(name)
         );
 
-      setBookmarkSearchResult([category]);
+      setBookmarkSearchResult([
+        {
+          id: -1,
+          name: 'Search Results',
+          isPinned: true,
+          isPublic: true,
+          orderId: -1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          bookmarks,
+        },
+      ]);
     } else {
       setAppSearchResult(null);
       setBookmarkSearchResult(null);
     }
-  }, [localSearch]);
+  }, [localSearch, visibleApps, visibleCategories]);
 
   return (
     <Container>
@@ -164,8 +201,8 @@ export const Home = (): JSX.Element => {
       />
 
       {!isAuthenticated &&
-      !apps.some((a) => a.isPinned) &&
-      !categories.some((c) => c.isPinned) ? (
+      !pinnedVisibleApps.length &&
+      !pinnedVisibleCategories.length ? (
         <Message>
           Welcome to Flame! Go to <Link to="/settings/app">/settings</Link>,
           login and start customizing your new homepage
@@ -174,7 +211,7 @@ export const Home = (): JSX.Element => {
         <></>
       )}
 
-      {!config.hideApps && (isAuthenticated || apps.some((a) => a.isPinned)) ? (
+      {!config.hideApps && (isAuthenticated || pinnedVisibleApps.length) ? (
         <Fragment>
           <SectionHeadline title="Applications" link="/applications" />
           {appsLoading ? (
@@ -183,10 +220,10 @@ export const Home = (): JSX.Element => {
             <AppGrid
               apps={
                 !appSearchResult
-                  ? apps.filter(({ isPinned }) => isPinned)
+                  ? pinnedVisibleApps
                   : appSearchResult
               }
-              totalApps={apps.length}
+              totalApps={visibleApps.length}
               searching={!!localSearch}
             />
           )}
@@ -197,7 +234,7 @@ export const Home = (): JSX.Element => {
       )}
 
       {!config.hideCategories &&
-      (isAuthenticated || categories.some((c) => c.isPinned)) ? (
+      (isAuthenticated || pinnedVisibleCategories.length) ? (
         <Fragment>
           <SectionHeadline title="Bookmarks" link="/bookmarks" />
           {bookmarksLoading ? (
@@ -206,12 +243,10 @@ export const Home = (): JSX.Element => {
             <BookmarkGrid
               categories={
                 !bookmarkSearchResult
-                  ? categories.filter(
-                      ({ isPinned, bookmarks }) => isPinned && bookmarks.length
-                    )
+                  ? pinnedVisibleCategories
                   : bookmarkSearchResult
               }
-              totalCategories={categories.length}
+              totalCategories={visibleCategories.length}
               searching={!!localSearch}
               fromHomepage={true}
             />
