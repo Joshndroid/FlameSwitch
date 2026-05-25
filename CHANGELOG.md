@@ -1,3 +1,10 @@
+### vv1.2 (2026-05-25)
+- Fix up hiding
+- Bump ws in the npm_and_yarn group across 1 directory
+- Bump qs in the npm_and_yarn group across 1 directory
+- Bump fast-uri in the npm_and_yarn group across 1 directory
+- chore: bump version to 1.1
+
 ### v1.1 (2026-05-09)
 - Bump the npm_and_yarn group across 2 directories with 2 updates
 - Bump ip-address in the npm_and_yarn group across 1 directory
