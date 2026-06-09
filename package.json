@@ -33,7 +33,7 @@
     "ws": "^8.21.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.14"
   },
   "overrides": {
     "ajv": "^8.18.0"
