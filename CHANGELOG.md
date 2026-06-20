@@ -1,3 +1,15 @@
+### vv1.5 (2026-06-20)
+- v1.5
+- Bump the npm_and_yarn group across 2 directories with 3 updates
+- Bump multer in the npm_and_yarn group across 1 directory
+- chore: bump version to 1.4
+- Bump esbuild in /client in the npm_and_yarn group across 1 directory
+- Bump brace-expansion in the npm_and_yarn group across 1 directory
+- Bump react-router
+- Bump the npm_and_yarn group across 2 directories with 1 update
+- chore: bump version to 1.3
+- chore: bump version to v1.2
+
 ### v1.4 (2026-06-14)
 ### vv1.2 (2026-05-25)
 - Fix up hiding
