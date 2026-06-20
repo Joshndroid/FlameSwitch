@@ -1,9 +1,4 @@
 ### v1.4 (2026-06-14)
-
-
-### v1.3 (2026-05-25)
-
-
 ### vv1.2 (2026-05-25)
 - Fix up hiding
 - Bump ws in the npm_and_yarn group across 1 directory
