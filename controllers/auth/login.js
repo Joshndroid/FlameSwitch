@@ -2,13 +2,16 @@ const asyncWrapper = require('../../middleware/asyncWrapper');
 const ErrorResponse = require('../../utils/ErrorResponse');
 const signToken = require('../../utils/signToken');
 const crypto = require('crypto');
+const { promisify } = require('util');
+const passwordComparisonSalt = crypto.randomBytes(16);
+const scrypt = promisify(crypto.scrypt);
 
-const passwordsMatch = (expected, supplied) => {
+const passwordsMatch = async (expected, supplied) => {
   if (typeof expected !== 'string' || !expected || typeof supplied !== 'string') {
     return false;
   }
-  const expectedHash = crypto.createHash('sha256').update(String(expected)).digest();
-  const suppliedHash = crypto.createHash('sha256').update(String(supplied)).digest();
+  const expectedHash = await scrypt(expected, passwordComparisonSalt, 64);
+  const suppliedHash = await scrypt(supplied, passwordComparisonSalt, 64);
   return crypto.timingSafeEqual(expectedHash, suppliedHash);
 };
 
@@ -27,7 +30,7 @@ const login = asyncWrapper(async (req, res, next) => {
     return next(new ErrorResponse('Authentication is not configured', 503));
   }
 
-  const isMatch = passwordsMatch(process.env.PASSWORD, password);
+  const isMatch = await passwordsMatch(process.env.PASSWORD, password);
 
   if (!isMatch) {
     return next(new ErrorResponse('Invalid credentials', 401));

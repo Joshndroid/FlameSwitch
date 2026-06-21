@@ -40,10 +40,10 @@ test('public config never exposes the weather API key', () => {
   assert.equal(redactConfig(config, true).WEATHER_API_KEY, 'private-value');
 });
 
-test('password comparison is exact', () => {
-  assert.equal(passwordsMatch('correct horse', 'correct horse'), true);
-  assert.equal(passwordsMatch('correct horse', 'correct Horse'), false);
-  assert.equal(passwordsMatch(undefined, undefined), false);
+test('password comparison is exact', async () => {
+  assert.equal(await passwordsMatch('correct horse', 'correct horse'), true);
+  assert.equal(await passwordsMatch('correct horse', 'correct Horse'), false);
+  assert.equal(await passwordsMatch(undefined, undefined), false);
 });
 
 test('rate limiter is mounted after health and static routes', () => {
