@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 const { redactConfig } = require('../controllers/config/getConfig');
 const { passwordsMatch } = require('../controllers/auth/login');
+const { slugify } = require('../db/utils/slugify');
 
 const runAuth = (authorization) => {
   const req = {
@@ -44,6 +45,12 @@ test('password comparison is exact', async () => {
   assert.equal(await passwordsMatch('correct horse', 'correct horse'), true);
   assert.equal(await passwordsMatch('correct horse', 'correct Horse'), false);
   assert.equal(await passwordsMatch(undefined, undefined), false);
+});
+
+test('database backup names do not depend on a .env VERSION', () => {
+  assert.equal(slugify('v1.6.1'), 'db-v161-backup.sqlite');
+  assert.equal(slugify('../../outside'), 'db-outside-backup.sqlite');
+  assert.match(slugify(), /^db-[a-zA-Z0-9_-]+-backup\.sqlite$/);
 });
 
 test('rate limiter is mounted after health and static routes', () => {
