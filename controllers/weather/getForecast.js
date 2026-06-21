@@ -1,4 +1,4 @@
-const getGeoFromIP = require('../../utils/geoIP');
+const { getGeoFromIP } = require('../../utils/geoIP');
 const { getForecast } = require('../../utils/weather');
 const loadConfig = require('../../utils/loadConfig');
 const asyncWrapper = require('../../middleware/asyncWrapper');
@@ -26,9 +26,7 @@ module.exports = asyncWrapper(async (req, res) => {
     lat = config.lat;
     lon = config.long;
   } else {
-    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '')
-      .split(',')[0]
-      .trim();
+    const ip = req.ip || req.socket.remoteAddress || '';
 
     try {
       const loc = await getGeoFromIP(ip);

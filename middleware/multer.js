@@ -1,29 +1,58 @@
+const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
 const multer = require('multer');
+const ErrorResponse = require('../utils/ErrorResponse');
 
-if (!fs.existsSync('data/uploads')) {
-  fs.mkdirSync('data/uploads', { recursive: true });
-}
+const uploadDir = path.resolve('data/uploads');
+fs.mkdirSync(uploadDir, { recursive: true });
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './data/uploads');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '--' + file.originalname);
-  },
-});
-
-const supportedTypes = ['jpg', 'jpeg', 'png', 'svg', 'svg+xml', 'x-icon', 'webp'];
-
-const fileFilter = (req, file, cb) => {
-  if (supportedTypes.includes(file.mimetype.split('/')[1])) {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
+const mimeExtensions = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/x-icon': '.ico',
+  'image/vnd.microsoft.icon': '.ico',
+  'image/webp': '.webp',
 };
 
-const upload = multer({ storage, fileFilter });
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) =>
+    cb(null, `${crypto.randomUUID()}${mimeExtensions[file.mimetype] || ''}`),
+});
 
-module.exports = upload.single('icon');
+const uploader = multer({
+  storage,
+  limits: { files: 1, fileSize: 2 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => cb(null, Boolean(mimeExtensions[file.mimetype])),
+}).single('icon');
+
+const hasValidSignature = (filePath) => {
+  const buffer = Buffer.alloc(12);
+  const fd = fs.openSync(filePath, 'r');
+  const bytesRead = fs.readSync(fd, buffer, 0, buffer.length, 0);
+  fs.closeSync(fd);
+  const bytes = buffer.subarray(0, bytesRead);
+
+  return (
+    bytes.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) ||
+    bytes.subarray(0, 3).equals(Buffer.from('ffd8ff', 'hex')) ||
+    (bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WEBP') ||
+    bytes.subarray(0, 4).equals(Buffer.from('00000100', 'hex'))
+  );
+};
+
+module.exports = (req, res, next) => {
+  uploader(req, res, (error) => {
+    if (error) return next(new ErrorResponse(error.message, 400));
+    if (!req.file) return next();
+
+    if (!hasValidSignature(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+      req.file = undefined;
+      return next(new ErrorResponse('Invalid image file', 400));
+    }
+
+    next();
+  });
+};

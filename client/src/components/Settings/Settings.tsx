@@ -20,6 +20,8 @@ import { StyleSettings } from './StyleSettings/StyleSettings';
 
 export const Settings = (): JSX.Element => {
   const { isAuthenticated } = useSelector((state: State) => state.auth);
+  const navClassName = ({ isActive }: { isActive: boolean }) =>
+    `${classes.SettingsNavLink} ${isActive ? classes.Active : ''}`;
 
   return (
     <Container>
@@ -31,50 +33,43 @@ export const Settings = (): JSX.Element => {
             <h2 className={classes.SettingsNavTitle}>Settings</h2>
             <NavLink
               to="/settings/app"
-              className={classes.SettingsNavLink}
-              activeClassName={classes.Active}
+              className={navClassName}
             >
               General
             </NavLink>
             <NavLink
               to="/settings/ui"
-              className={classes.SettingsNavLink}
-              activeClassName={classes.Active}
+              className={navClassName}
             >
               Interface
             </NavLink>
             <NavLink
               to="/settings/weather"
-              className={classes.SettingsNavLink}
-              activeClassName={classes.Active}
+              className={navClassName}
             >
               Weather
             </NavLink>
             <NavLink
               to="/settings/docker"
-              className={classes.SettingsNavLink}
-              activeClassName={classes.Active}
+              className={navClassName}
             >
               Docker
             </NavLink>
             <NavLink
               to="/settings/theme"
-              className={classes.SettingsNavLink}
-              activeClassName={classes.Active}
+              className={navClassName}
             >
               Theme
             </NavLink>
             <NavLink
               to="/settings/css"
-              className={classes.SettingsNavLink}
-              activeClassName={classes.Active}
+              className={navClassName}
             >
               CSS
             </NavLink>
             <NavLink
               to="/settings/details"
-              className={classes.SettingsNavLink}
-              activeClassName={classes.Active}
+              className={navClassName}
             >
               About
             </NavLink>

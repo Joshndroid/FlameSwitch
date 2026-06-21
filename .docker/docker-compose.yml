@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   flame:
-    image: spiicytuna/flame
+    image: ghcr.io/joshndroid/flame-switch:latest
     container_name: flame
     volumes:
       - /path/to/host/data:/app/data
@@ -14,10 +12,16 @@ services:
     # secrets:
     #   - password # optional but required for (1)
     environment:
-      - PASSWORD=flame_password
+      - PASSWORD=${PASSWORD:?Set PASSWORD before starting FlameSwitch}
       # - PASSWORD_FILE=/run/secrets/password # optional but required for (1)
       # - WEATHER_CACHE_HOURS=6  #  optional to cut down calls to weather api
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
 
 # optional but required for Docker secrets (1)
 # secrets:
@@ -29,4 +33,4 @@ services:
       interval: 60s
       timeout: 10s
       retries: 3
-
+      start_period: 30s

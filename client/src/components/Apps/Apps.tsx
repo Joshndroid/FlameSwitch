@@ -24,7 +24,7 @@ import { bindActionCreators } from 'redux';
 import { actionCreators } from '../../store';
 
 interface Props {
-  searching: boolean;
+  searching?: boolean;
 }
 
 export const Apps = (props: Props): JSX.Element => {
@@ -100,7 +100,7 @@ export const Apps = (props: Props): JSX.Element => {
         {loading ? (
           <Spinner />
         ) : !showTable ? (
-          <AppGrid apps={apps} searching={props.searching} />
+          <AppGrid apps={apps} searching={Boolean(props.searching)} />
         ) : (
           <AppTable openFormForUpdating={openFormForUpdating} />
         )}

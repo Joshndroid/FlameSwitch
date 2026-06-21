@@ -6,6 +6,14 @@ export interface WeatherForm {
   long: number;
   isCelsius: boolean;
   weatherData: WeatherData;
+  weatherMode: 'geoip' | 'fixed';
+  weatherWidgetIcon: number;
+  showExtraWeatherColumn: boolean;
+  extraWeatherTop: string;
+  extraWeatherBottom: string;
+  forecastEnable: boolean;
+  forecastDays: number;
+  forecastCache: boolean;
 }
 
 export interface GeneralForm {

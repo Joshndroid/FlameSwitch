@@ -1,16 +1,16 @@
-import { ReactNode } from 'react';
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 import classes from './Button.module.css';
 
-interface Props {
+interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   click?: any;
 }
 
 export const Button = (props: Props): JSX.Element => {
-  const { children, click } = props;
+  const { children, click, ...buttonProps } = props;
 
   return (
-    <button className={classes.Button} onClick={click ? click : () => {}}>
+    <button {...buttonProps} className={`${classes.Button} ${props.className || ''}`} onClick={click || props.onClick}>
       {children}
     </button>
   );

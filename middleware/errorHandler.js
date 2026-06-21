@@ -17,9 +17,10 @@ const errorHandler = (err, req, res, next) => {
     console.log(err);
   }
 
-  res.status(err.statusCode || 500).json({
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
     success: false,
-    error: error.message || 'Server Error',
+    error: statusCode >= 500 ? 'Server Error' : error.message,
   });
 };
 

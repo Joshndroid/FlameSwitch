@@ -4,14 +4,14 @@ metadata:
   name: flame
 build:
   artifacts:
-  - image: shokohsc/flame
+  - image: ghcr.io/joshndroid/flame-switch
     context: .
     sync:
       manual:
       - src: controllers/*.js
         dest: .
     docker:
-      dockerfile: Dockerfile.dev
+      dockerfile: .docker/Dockerfile.kubernetes
 deploy:
   kustomize:
     paths:
@@ -22,23 +22,23 @@ profiles:
   - command: dev
   build:
     artifacts:
-    - image: shokohsc/flame
+    - image: ghcr.io/joshndroid/flame-switch
       sync:
         manual:
         - src: controllers/*.js
           dest: .
       docker:
-        dockerfile: Dockerfile.dev
+        dockerfile: .docker/Dockerfile.kubernetes
 - name: shokohsc
   build:
     artifacts:
-    - image: shokohsc/flame
+    - image: ghcr.io/joshndroid/flame-switch
       sync:
         manual:
         - src: controllers/*.js
           dest: .
       kaniko:
-        dockerfile: Dockerfile.dev
+        dockerfile: .docker/Dockerfile.kubernetes
         cache:
           repo: shokohsc/flame
     cluster:
@@ -53,9 +53,9 @@ profiles:
 - name: prod
   build:
     artifacts:
-    - image: shokohsc/flame
+    - image: ghcr.io/joshndroid/flame-switch
       kaniko:
-        dockerfile: Dockerfile
+        dockerfile: .docker/Dockerfile
         cache:
           repo: shokohsc/flame
     cluster:

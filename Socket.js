@@ -4,7 +4,11 @@ const logger = new Logger();
 
 class Socket {
   constructor(server) {
-    this.webSocketServer = new WebSocket.Server({ server })
+    this.webSocketServer = new WebSocket.Server({
+      server,
+      maxPayload: 64 * 1024,
+      perMessageDeflate: false,
+    })
 
     this.webSocketServer.on('listening', () => {
       logger.log('Socket: listen');

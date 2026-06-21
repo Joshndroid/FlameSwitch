@@ -40,4 +40,8 @@ export interface Config {
   forecastEnable?: boolean;
   forecastDays: number;
   forecastCache: boolean;
+  automaticUpdates?: boolean;
+  useDefaults?: boolean;
+  updateUrl?: string;
+  showPopups?: boolean;
 }

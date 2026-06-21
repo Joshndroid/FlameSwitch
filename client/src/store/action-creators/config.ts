@@ -24,7 +24,9 @@ const keys: (keyof Config)[] = [
 
 export const getConfig = () => async (dispatch: Dispatch<GetConfigAction>) => {
   try {
-    const res = await axios.get<ApiResponse<Config>>('/api/config');
+    const res = await axios.get<ApiResponse<Config>>('/api/config', {
+      headers: applyAuth(),
+    });
 
     dispatch({
       type: ActionType.getConfig,

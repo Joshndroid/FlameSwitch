@@ -13,16 +13,52 @@ spec:
         app: flame
     spec:
       serviceAccountName: flame
+      terminationGracePeriodSeconds: 30
       securityContext:
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: flame
-          image: shokohsc/flame
+          image: ghcr.io/joshndroid/flame-switch:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1000
           ports:
             - name: http
               containerPort: 5005
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 24
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: flame-data

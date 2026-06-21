@@ -11,7 +11,7 @@ const getCurrentWeather = asyncWrapper(async (req, res, next) => {
     lat = config.lat;
     lon = config.long;
   } else {
-    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const ip = req.ip || req.socket.remoteAddress || '';
     const loc = await getGeoFromIP(ip);
     lat = loc?.lat || config.lat;
     lon = loc?.lon || config.long;

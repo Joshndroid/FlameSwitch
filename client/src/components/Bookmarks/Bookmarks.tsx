@@ -29,7 +29,7 @@ import { Form } from './Form/Form';
 import { Table } from './Table/Table';
 
 interface Props {
-  searching: boolean;
+  searching?: boolean;
 }
 
 export enum ContentType {
@@ -183,7 +183,7 @@ export const Bookmarks = (props: Props): JSX.Element => {
       {loading ? (
         <Spinner />
       ) : !showTable ? (
-        <BookmarkGrid categories={categories} searching={props.searching} />
+        <BookmarkGrid categories={categories} searching={Boolean(props.searching)} />
       ) : (
         <Table
           contentType={tableContentType}

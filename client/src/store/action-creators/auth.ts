@@ -8,7 +8,7 @@ import {
   LogoutAction,
 } from '../actions/auth';
 import axios, { AxiosError } from 'axios';
-import { getApps, getCategories } from '.';
+import { getApps, getCategories, getConfig } from '.';
 
 export const login =
   (formData: { password: string; duration: string }) =>
@@ -28,6 +28,7 @@ export const login =
 
       dispatch<any>(getApps());
       dispatch<any>(getCategories());
+      dispatch<any>(getConfig());
     } catch (err) {
       dispatch<any>(authError(err, true));
     }
@@ -42,6 +43,7 @@ export const logout = () => (dispatch: Dispatch<LogoutAction>) => {
 
   dispatch<any>(getApps());
   dispatch<any>(getCategories());
+  dispatch<any>(getConfig());
 };
 
 export const autoLogin = () => async (dispatch: Dispatch<AutoLoginAction>) => {
@@ -60,6 +62,7 @@ export const autoLogin = () => async (dispatch: Dispatch<AutoLoginAction>) => {
 
     dispatch<any>(getApps());
     dispatch<any>(getCategories());
+    dispatch<any>(getConfig());
   } catch (err) {
     dispatch<any>(authError(err, false));
   }
@@ -68,7 +71,7 @@ export const autoLogin = () => async (dispatch: Dispatch<AutoLoginAction>) => {
 export const authError =
   (error: unknown, showNotification: boolean) =>
   (dispatch: Dispatch<AuthErrorAction>) => {
-    const apiError = error as AxiosError;
+    const apiError = error as AxiosError<{ error?: string }>;
 
     if (showNotification) {
       dispatch<any>({

@@ -49,15 +49,21 @@ docker pull ghcr.io/joshndroid/flame-switch:latest
 
 ```sh
 # run container
-docker run -p 5005:5005 -v /path/to/data:/app/data -e PASSWORD=flame_password joshndroid/flame
+docker run -p 5005:5005 \
+  -v /path/to/data:/app/data \
+  -v /path/to/flame_password:/run/secrets/password:ro \
+  -e PASSWORD_FILE=/run/secrets/password \
+  --security-opt=no-new-privileges:true \
+  --cap-drop=ALL \
+  ghcr.io/joshndroid/flame-switch:latest
 ```
 
 #### Building images
 
 ```sh
-git clone https://github.com/joshndroid/flame
+git clone https://github.com/joshndroid/flame-switch
 
-cd flame
+cd flame-switch
 
 git checkout master
 
@@ -66,18 +72,16 @@ git checkout master
 docker buildx build \
   --platform linux/arm64,linux/amd64 \
   -f .docker/Dockerfile.multiarch \
-  -t ghcr.io/joshndroid/flame:switch \
+  -t ghcr.io/joshndroid/flame-switch:latest \
   .
 ```
 
 #### Docker-Compose
 
 ```yaml
-version: "3.8"
-
 services:
   flame:
-    image: ghcr.io/spiicytuna/flame:dev
+    image: ghcr.io/joshndroid/flame-switch:latest
     container_name: flame
     restart: unless-stopped
     ports:
@@ -88,13 +92,20 @@ services:
       # - /var/log/flame-dash:/app/log  #  optional external access.log remote logging or fail2ban
       # - /var/run/docker.sock:/var/run/docker.sock # optional but required for Docker integration
     environment:
-      - PASSWORD=changeme
+      - PASSWORD=${PASSWORD:?Set PASSWORD before starting FlameSwitch}
       # - WEATHER_CACHE_HOURS=6  #  optional to cut down calls to weather api
     healthcheck:
       test: ["CMD", "curl", "-fs", "http://localhost:5005/health"]
       interval: 60s
       timeout: 10s
       retries: 3
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
 ```
 
 ##### Docker Secrets
@@ -200,28 +211,9 @@ labels:
   - flame.icon=icon-name1;icon-name2
 ```
 
-If you want to use a remote docker host follow this instructions in the host:
-
-- Open the file `/lib/systemd/system/docker.service`, search for `ExecStart` and edit the value
-
-```text
-ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:${PORT} -H unix:///var/run/docker.sock
-```
-
->The above command will bind the docker engine server to the Unix socket as well as TCP port of your choice. “0.0.0.0” means docker-engine accepts connections from all IP addresses.
-
-- Restart the daemon and Docker service
-
-```shell
-sudo systemctl daemon-reload
-sudo service docker restart
-```
-
-- Test if it is working
-
-```shell
-curl http://${IP}:${PORT}/version
-```
+For a remote Docker host, use Docker's authenticated TLS or SSH transport and
+restrict access at the firewall. Never expose an unauthenticated Docker API on
+`0.0.0.0`: access to that API is effectively root access to the host.
 
 ### Kubernetes integration
 

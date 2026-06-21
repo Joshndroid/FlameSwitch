@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
+import axios from 'axios';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // Redux
@@ -13,10 +14,11 @@ import { checkVersion, decodeToken, parsePABToTheme } from './utility';
 
 // Routes
 import { Home } from './components/Home/Home';
-import { Apps } from './components/Apps/Apps';
-import { Settings } from './components/Settings/Settings';
-import { Bookmarks } from './components/Bookmarks/Bookmarks';
 import { NotificationCenter } from './components/NotificationCenter/NotificationCenter';
+
+const Apps = lazy(() => import('./components/Apps/Apps').then((module) => ({ default: module.Apps })));
+const Settings = lazy(() => import('./components/Settings/Settings').then((module) => ({ default: module.Settings })));
+const Bookmarks = lazy(() => import('./components/Bookmarks/Bookmarks').then((module) => ({ default: module.Bookmarks })));
 
 // routing
 import { ProtectedRoute } from './components/Routing/ProtectedRoute';
@@ -89,7 +91,8 @@ export const App = (): JSX.Element => {
   return (
     <>
       <BrowserRouter>
-          <Routes>
+          <Suspense fallback={<div>Loading…</div>}>
+            <Routes>
             {/* Public route */}
             <Route path="/" element={<Home />} />
 
@@ -116,7 +119,8 @@ export const App = (): JSX.Element => {
                   <Settings />
               }
             />
-          </Routes>
+            </Routes>
+          </Suspense>
       </BrowserRouter>
       <NotificationCenter />
     </>

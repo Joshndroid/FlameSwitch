@@ -17,7 +17,7 @@ import { greeter } from './functions/greeter';
 
 interface HeaderProps {
   onWidgetClick?: () => void;
-  forecastEnable: boolean;
+  forecastEnable?: boolean;
 }
 
 export const Header = ({ onWidgetClick, forecastEnable }: HeaderProps): JSX.Element => {

@@ -7,12 +7,12 @@ ENV NPM_CONFIG_UPDATE_NOTIFIER=false
 
 # Server deps
 COPY package*.json ./
-RUN npm install --production
+RUN npm ci --omit=dev
 
 # Client deps + build
 WORKDIR /app/client
 COPY ./client/package*.json ./
-RUN npm install
+RUN npm ci
 COPY ./client/ ./
 RUN npm run build
 
@@ -23,19 +23,20 @@ RUN mkdir -p ./public && mv ./client/dist/* ./public
 RUN rm -rf ./client
 
 # ---- Final Stage ----
-FROM lscr.io/linuxserver/baseimage-alpine:3.22
+FROM node:22-alpine
 
 # Install node and runtime deps
-RUN apk add --no-cache nodejs curl jq sqlite
+RUN apk add --no-cache curl sqlite
 
 ARG APP_VERSION=dev
 ENV NODE_ENV=production
 ENV APP_VERSION=${APP_VERSION}
 
 # Copy built app from builder
-COPY --from=builder /app /app
+COPY --from=builder --chown=node:node /app /app
+RUN mkdir -p /app/data /app/log && chown -R node:node /app/data /app/log /app/public
 
-# Copy s6 service definitions
-COPY root/ /
+USER node
 
 EXPOSE 5005
+CMD ["node", "server.js"]

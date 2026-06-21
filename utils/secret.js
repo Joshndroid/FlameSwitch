@@ -16,6 +16,7 @@ const initializeSecret = () => {
   try {
     // secret file already exists => read it => set env var
     if (fs.existsSync(secretPath)) {
+      fs.chmodSync(secretPath, 0o600);
       const secret = fs.readFileSync(secretPath, 'utf-8').trim();
       process.env.SECRET = secret;
       logger.log('Secret key loaded from file.');
@@ -25,7 +26,7 @@ const initializeSecret = () => {
       const newSecret = crypto.randomBytes(64).toString('hex');
 
       // save secret
-      fs.writeFileSync(secretPath, newSecret, 'utf-8');
+      fs.writeFileSync(secretPath, newSecret, { encoding: 'utf-8', mode: 0o600 });
 
       // set cur session env var
       process.env.SECRET = newSecret;

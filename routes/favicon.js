@@ -1,163 +1,119 @@
 const express = require('express');
-const { execSync } = require('child_process');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const App = require('../models/App');
+const Bookmark = require('../models/Bookmark');
+const rateLimit = require('../middleware/rateLimit');
 
 const router = express.Router();
+const cacheDir = path.resolve('data/favicon-cache');
+const maxBytes = 1024 * 1024;
+fs.mkdirSync(cacheDir, { recursive: true });
 
-// Cache directory for favicons
-const FAVICON_CACHE_DIR = path.join(__dirname, '../data/favicon-cache');
+const faviconRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  message: 'Too many favicon requests. Try again later.',
+});
 
-// Ensure cache directory exists
-if (!fs.existsSync(FAVICON_CACHE_DIR)) {
-  fs.mkdirSync(FAVICON_CACHE_DIR, { recursive: true });
-}
-
-/**
- * Check if a hostname is a local/private IP address
- */
-function isLocalIP(hostname) {
-  return (
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname.startsWith('192.168.') ||
-    hostname.startsWith('10.') ||
-    /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)
-  );
-}
-
-/**
- * Extract domain from URL
- */
-function extractDomain(url) {
+const parseURL = (value) => {
   try {
-    const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-    return urlObj.hostname + (urlObj.port && urlObj.port !== '80' && urlObj.port !== '443' ? ':' + urlObj.port : '');
-  } catch (err) {
+    const url = new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`);
+    return ['http:', 'https:'].includes(url.protocol) ? url : null;
+  } catch {
     return null;
   }
-}
+};
 
-/**
- * Try to fetch favicon from common locations
- */
-async function tryFetchFavicon(domain, isLocal) {
-  const protocol = isLocal ? 'http' : 'https';
-  const commonPaths = [
-    '/favicon.ico',
-    '/apple-touch-icon.png',
-    '/apple-touch-icon-precomposed.png',
-  ];
+const isConfiguredURL = async (requested) => {
+  const [apps, bookmarks] = await Promise.all([
+    App.findAll({ attributes: ['url'], raw: true }),
+    Bookmark.findAll({ attributes: ['url'], raw: true }),
+  ]);
 
-  for (const faviconPath of commonPaths) {
-    const faviconUrl = `${protocol}://${domain}${faviconPath}`;
-    try {
-      // Use curl to check if URL is accessible
-      execSync(`curl -I -L -s -m 3 -A "Mozilla/5.0" "${faviconUrl}"`, {
-        stdio: 'pipe'
-      });
-      return faviconUrl;
-    } catch (err) {
-      // Continue to next path
-    }
-  }
+  return [...apps, ...bookmarks].some(({ url }) => {
+    const configured = parseURL(url);
+    return configured && configured.origin === requested.origin;
+  });
+};
 
-  // Fallback
-  return `${protocol}://${domain}/favicon.ico`;
-}
+const isImage = (bytes) =>
+  bytes.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) ||
+  bytes.subarray(0, 3).equals(Buffer.from('ffd8ff', 'hex')) ||
+  (bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WEBP') ||
+  bytes.subarray(0, 4).equals(Buffer.from('00000100', 'hex'));
 
-/**
- * Download favicon using curl
- */
-function downloadFavicon(faviconUrl, outputPath) {
-  try {
-    execSync(`curl -L -s -m 10 -A "Mozilla/5.0" -o "${outputPath}" "${faviconUrl}"`, {
-      stdio: 'pipe'
+const fetchImage = async (initialURL) => {
+  let current = initialURL;
+
+  for (let redirects = 0; redirects <= 3; redirects += 1) {
+    const response = await fetch(current, {
+      redirect: 'manual',
+      signal: AbortSignal.timeout(5000),
+      headers: { 'User-Agent': 'FlameSwitch favicon fetcher' },
     });
 
-    // Check if file was created and has content
-    if (fs.existsSync(outputPath)) {
-      const stats = fs.statSync(outputPath);
-      if (stats.size > 0) {
-        // Validate that it's actually an image file, not HTML/text
-        try {
-          const fileTypeOutput = execSync(`file -b --mime-type "${outputPath}"`, {
-            stdio: 'pipe',
-            encoding: 'utf-8'
-          }).trim();
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location');
+      if (!location) return null;
+      const next = new URL(location, current);
+      if (next.origin !== initialURL.origin) return null;
+      current = next;
+      continue;
+    }
 
-          // Check if it's an image MIME type
-          if (fileTypeOutput.startsWith('image/')) {
-            return true;
-          }
-        } catch (err) {
-          // file command failed, clean up and return false
-        }
+    if (!response.ok) return null;
+    const declaredLength = Number(response.headers.get('content-length'));
+    if (declaredLength > maxBytes) return null;
+
+    const reader = response.body.getReader();
+    const chunks = [];
+    let length = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      length += value.length;
+      if (length > maxBytes) {
+        await reader.cancel();
+        return null;
       }
-      fs.unlinkSync(outputPath);
+      chunks.push(value);
     }
-    return false;
-  } catch (err) {
-    if (fs.existsSync(outputPath)) {
-      fs.unlinkSync(outputPath);
-    }
-    return false;
-  }
-}
 
-/**
- * GET /api/favicon?url=<url>
- * Fetches and caches favicon for the given URL
- */
-router.get('/', async (req, res) => {
-  const { url } = req.query;
-
-  if (!url) {
-    return res.status(400).json({ error: 'URL parameter required' });
+    const bytes = Buffer.concat(chunks);
+    return isImage(bytes) ? bytes : null;
   }
 
-  const domain = extractDomain(url);
-  if (!domain) {
-    return res.status(400).json({ error: 'Invalid URL' });
-  }
+  return null;
+};
 
-  // Create cache filename from domain hash
-  const hash = crypto.createHash('md5').update(domain).digest('hex');
-  const cacheFile = path.join(FAVICON_CACHE_DIR, `${hash}.ico`);
-
-  // Check cache first
-  if (fs.existsSync(cacheFile)) {
-    const stats = fs.statSync(cacheFile);
-    // Serve from cache if less than 7 days old
-    const age = Date.now() - stats.mtimeMs;
-    const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-
-    if (age < maxAge) {
-      return res.sendFile(cacheFile);
-    }
-  }
-
-  // Try to fetch favicon
+router.get('/', faviconRateLimit, async (req, res, next) => {
   try {
-    const isLocal = isLocalIP(domain);
-    const faviconUrl = await tryFetchFavicon(domain, isLocal);
-
-    if (downloadFavicon(faviconUrl, cacheFile)) {
-      return res.sendFile(cacheFile);
+    const requested = typeof req.query.url === 'string' ? parseURL(req.query.url) : null;
+    if (!requested) return res.status(400).json({ error: 'Valid URL parameter required' });
+    if (!(await isConfiguredURL(requested))) {
+      return res.status(403).json({ error: 'URL is not configured in FlameSwitch' });
     }
 
-    // If direct fetch failed, try Google's service
-    const googleUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-    if (downloadFavicon(googleUrl, cacheFile)) {
-      return res.sendFile(cacheFile);
+    const hash = crypto.createHash('sha256').update(requested.origin).digest('hex');
+    const cacheFile = path.join(cacheDir, `${hash}.ico`);
+    if (fs.existsSync(cacheFile)) {
+      const age = Date.now() - fs.statSync(cacheFile).mtimeMs;
+      if (age < 7 * 24 * 60 * 60 * 1000) return res.sendFile(cacheFile);
     }
 
-    // All methods failed
+    for (const faviconPath of ['/favicon.ico', '/apple-touch-icon.png', '/apple-touch-icon-precomposed.png']) {
+      const bytes = await fetchImage(new URL(faviconPath, requested.origin));
+      if (bytes) {
+        fs.writeFileSync(cacheFile, bytes, { mode: 0o600 });
+        return res.sendFile(cacheFile);
+      }
+    }
+
     return res.status(404).json({ error: 'Favicon not found' });
-  } catch (err) {
-    console.error(`[Favicon] Error fetching favicon for ${domain}:`, err.message);
-    return res.status(500).json({ error: 'Failed to fetch favicon' });
+  } catch (error) {
+    next(error);
   }
 });
 

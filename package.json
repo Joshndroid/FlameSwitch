@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "init-server": "echo Instaling server dependencies && npm install",
-    "init-client": "cd client && echo Instaling client dependencies && npm install",
+    "test": "node --test test/*.test.js",
+    "audit:production": "npm audit --omit=dev",
+    "init-server": "echo Installing server dependencies && npm ci",
+    "init-client": "cd client && echo Installing client dependencies && npm ci",
     "dir-init": "npx mkdirp data public && touch public/flame.css public/customQueries.json",
     "dev-init": "npm run dir-init && npm run init-server && npm run init-client",
     "dev-server": "nodemon server.js -e js",

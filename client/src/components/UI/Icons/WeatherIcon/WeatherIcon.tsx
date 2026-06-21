@@ -7,6 +7,8 @@ import { IconMapping, TimeOfDay } from './IconMapping';
 interface Props {
   weatherStatusCode: number;
   isDay: number;
+  className?: string;
+  size?: number;
 }
 
 export const WeatherIcon = (props: Props): JSX.Element => {
@@ -28,5 +30,5 @@ export const WeatherIcon = (props: Props): JSX.Element => {
     };
   }, [props.weatherStatusCode, icon, activeTheme.colors.accent]);
 
-  return <canvas id={`weather-icon`} width="50" height="50"></canvas>;
+  return <canvas id="weather-icon" className={props.className} width={props.size || 50} height={props.size || 50}></canvas>;
 };
