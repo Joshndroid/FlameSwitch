@@ -5,14 +5,7 @@ const Bookmark = require('../../models/Bookmark');
 // @route     PUT /api/bookmarks/0/reorder
 // @access    Public
 const reorderBookmarks = asyncWrapper(async (req, res, next) => {
-  req.body.bookmarks.forEach(async ({ id, orderId }) => {
-    await Bookmark.update(
-      { orderId },
-      {
-        where: { id },
-      }
-    );
-  });
+  await Bookmark.reorder(req.body.bookmarks);
 
   res.status(200).json({
     success: true,

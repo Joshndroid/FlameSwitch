@@ -6,9 +6,7 @@ const Bookmark = require('../../models/Bookmark');
 // @route     PUT /api/bookmarks/:id
 // @access    Public
 const updateBookmark = asyncWrapper(async (req, res, next) => {
-  let bookmark = await Bookmark.findOne({
-    where: { id: req.params.id },
-  });
+  let bookmark = await Bookmark.findById(req.params.id);
 
   if (!bookmark) {
     return next(

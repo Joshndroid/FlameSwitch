@@ -33,8 +33,8 @@ const parseURL = (value) => {
 
 const isConfiguredURL = async (requested) => {
   const [apps, bookmarks] = await Promise.all([
-    App.findAll({ attributes: ['url'], raw: true }),
-    Bookmark.findAll({ attributes: ['url'], raw: true }),
+    App.list({ attributes: ['url'] }),
+    Bookmark.list({ attributes: ['url'] }),
   ]);
 
   return [...apps, ...bookmarks].some(({ url }) => {

@@ -6,10 +6,8 @@ const ErrorResponse = require('../../utils/ErrorResponse');
 // @route     GET /api/apps/:id
 // @access    Public
 const getSingleApp = asyncWrapper(async (req, res, next) => {
-  const visibility = req.isAuthenticated ? {} : { isPublic: true };
-
-  const app = await App.findOne({
-    where: { id: req.params.id, ...visibility },
+  const app = await App.findById(req.params.id, {
+    publicOnly: !req.isAuthenticated,
   });
 
   if (!app) {

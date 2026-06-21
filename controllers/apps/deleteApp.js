@@ -5,9 +5,7 @@ const App = require('../../models/App');
 // @route     DELETE /api/apps/:id
 // @access    Public
 const deleteApp = asyncWrapper(async (req, res, next) => {
-  await App.destroy({
-    where: { id: req.params.id },
-  });
+  await App.deleteById(req.params.id);
 
   res.status(200).json({
     success: true,

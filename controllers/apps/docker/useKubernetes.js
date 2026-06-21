@@ -43,7 +43,7 @@ const useKubernetes = async (apps) => {
         }));
 
       // --- Sync db with discovered apps ---
-      const currentApps = await App.findAll({ order: [[orderType, 'ASC']] });
+      const currentApps = await App.list({ orderBy: orderType });
 
       if (unpinStoppedApps) {
         for (const app of currentApps) {

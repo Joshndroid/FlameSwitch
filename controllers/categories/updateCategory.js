@@ -6,9 +6,7 @@ const Category = require('../../models/Category');
 // @route     PUT /api/categories/:id
 // @access    Public
 const updateCategory = asyncWrapper(async (req, res, next) => {
-  let category = await Category.findOne({
-    where: { id: req.params.id },
-  });
+  let category = await Category.findById(req.params.id);
 
   if (!category) {
     return next(

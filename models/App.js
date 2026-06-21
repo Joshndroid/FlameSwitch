@@ -1,50 +1,17 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db');
+const createRepository = require('./repository');
 
-const App = sequelize.define(
-  'App',
-  {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    url: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    icon: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'cancel',
-    },
-    isPinned: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    orderId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: null,
-    },
-    isPublic: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: 1,
-    },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: '',
-    },
-    invertIcon: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
+module.exports = createRepository({
+  table: 'apps',
+  fields: [
+    'name', 'url', 'icon', 'isPinned', 'orderId', 'isPublic', 'description', 'invertIcon',
+  ],
+  defaults: {
+    icon: 'cancel',
+    isPinned: false,
+    orderId: null,
+    isPublic: 1,
+    description: '',
+    invertIcon: false,
   },
-  {
-    tableName: 'apps',
-  }
-);
-
-module.exports = App;
+  booleans: ['isPinned', 'invertIcon'],
+});

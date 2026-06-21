@@ -1,19 +1,10 @@
-const { Op } = require('sequelize');
 const Weather = require('../models/Weather');
 
 const clearWeatherData = async () => {
-  const weather = await Weather.findOne({
-    order: [['createdAt', 'DESC']],
-  });
+  const weather = await Weather.latest();
 
   if (weather) {
-    await Weather.destroy({
-      where: {
-        id: {
-          [Op.lt]: weather.id,
-        },
-      },
-    });
+    await Weather.deleteBeforeId(weather.id);
   }
 };
 

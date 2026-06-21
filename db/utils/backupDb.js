@@ -1,21 +1,15 @@
 const fs = require('fs');
+const path = require('path');
 const { slugify } = require('./slugify');
 
-const backupDB = () => {
-  if (!fs.existsSync('data/db_backups')) {
-    fs.mkdirSync('data/db_backups');
-  }
+module.exports = (databasePath) => {
+  if (!fs.existsSync(databasePath)) return;
 
-  const slug = slugify();
+  const backupDirectory = path.join(path.dirname(databasePath), 'db_backups');
+  const backupPath = path.join(backupDirectory, slugify());
+  fs.mkdirSync(backupDirectory, { recursive: true });
 
-  const srcPath = 'data/db.sqlite';
-  const destPath = `data/db_backups/${slug}`;
-
-  if (fs.existsSync(srcPath)) {
-    if (!fs.existsSync(destPath)) {
-      fs.copyFileSync(srcPath, destPath);
-    }
+  if (!fs.existsSync(backupPath)) {
+    fs.copyFileSync(databasePath, backupPath);
   }
 };
-
-module.exports = backupDB;

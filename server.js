@@ -7,7 +7,6 @@ initializeSecret();
 
 // Database
 const { connectDB } = require('./db');
-const associateModels = require('./models/associateModels');
 
 // Server
 const api = require('./api');
@@ -26,7 +25,6 @@ const logger = new Logger();
   // Init app
   await initApp();
   await connectDB();
-  await associateModels();
   await jobs();
 
   // Create server for Express API and WebSockets

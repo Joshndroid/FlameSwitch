@@ -5,9 +5,7 @@ const Bookmark = require('../../models/Bookmark');
 // @route     DELETE /api/bookmarks/:id
 // @access    Public
 const deleteBookmark = asyncWrapper(async (req, res, next) => {
-  await Bookmark.destroy({
-    where: { id: req.params.id },
-  });
+  await Bookmark.deleteById(req.params.id);
 
   res.status(200).json({
     success: true,

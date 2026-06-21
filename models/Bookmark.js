@@ -1,44 +1,15 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db');
+const createRepository = require('./repository');
 
-const Bookmark = sequelize.define(
-  'Bookmark',
-  {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    url: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    categoryId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    icon: {
-      type: DataTypes.STRING,
-      defaultValue: '',
-    },
-    isPublic: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: 1,
-    },
-    orderId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: null,
-    },
-    invertIcon: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
+module.exports = createRepository({
+  table: 'bookmarks',
+  fields: [
+    'name', 'url', 'categoryId', 'icon', 'isPublic', 'orderId', 'invertIcon',
+  ],
+  defaults: {
+    icon: '',
+    isPublic: 1,
+    orderId: null,
+    invertIcon: false,
   },
-  {
-    tableName: 'bookmarks',
-  }
-);
-
-module.exports = Bookmark;
+  booleans: ['invertIcon'],
+});

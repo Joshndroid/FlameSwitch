@@ -38,9 +38,7 @@ const useDocker = async (apps) => {
   }
 
   if (containers) {
-    apps = await App.findAll({
-      order: [[orderType, 'ASC']],
-    });
+    apps = await App.list({ orderBy: orderType });
 
     // Filter out containers without any annotations
     containers = containers.filter((e) => Object.keys(e.Labels).length !== 0);

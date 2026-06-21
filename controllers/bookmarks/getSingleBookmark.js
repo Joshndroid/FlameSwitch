@@ -6,10 +6,8 @@ const Bookmark = require('../../models/Bookmark');
 // @route     GET /api/bookmarks/:id
 // @access    Public
 const getSingleBookmark = asyncWrapper(async (req, res, next) => {
-  const visibility = req.isAuthenticated ? {} : { isPublic: true };
-
-  const bookmark = await Bookmark.findOne({
-    where: { id: req.params.id, ...visibility },
+  const bookmark = await Bookmark.findById(req.params.id, {
+    publicOnly: !req.isAuthenticated,
   });
 
   if (!bookmark) {

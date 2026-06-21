@@ -1,13 +1,12 @@
 const asyncWrapper = require('../../middleware/asyncWrapper');
 const App = require('../../models/App');
+const ErrorResponse = require('../../utils/ErrorResponse');
 
 // @desc      Update app
 // @route     PUT /api/apps/:id
 // @access    Public
 const updateApp = asyncWrapper(async (req, res, next) => {
-  let app = await App.findOne({
-    where: { id: req.params.id },
-  });
+  let app = await App.findById(req.params.id);
 
   if (!app) {
     return next(

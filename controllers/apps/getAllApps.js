@@ -1,6 +1,5 @@
 const asyncWrapper = require('../../middleware/asyncWrapper');
 const App = require('../../models/App');
-const { Sequelize } = require('sequelize');
 const loadConfig = require('../../utils/loadConfig');
 
 const { useKubernetes, useDocker } = require('./docker');
@@ -26,16 +25,9 @@ const getAllApps = asyncWrapper(async (req, res, next) => {
   }
 
   // apps visibility
-  const where = req.isAuthenticated ? {} : { isPublic: true };
-
-  const order =
-    orderType == 'name'
-      ? [[Sequelize.fn('lower', Sequelize.col('name')), 'ASC']]
-      : [[orderType, 'ASC']];
-
-  apps = await App.findAll({
-    order,
-    where,
+  apps = await App.list({
+    orderBy: orderType,
+    publicOnly: !req.isAuthenticated,
   });
 
   if (process.env.NODE_ENV === 'production') {

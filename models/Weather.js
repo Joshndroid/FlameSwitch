@@ -1,23 +1,18 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db');
+const createRepository = require('./repository');
+const db = require('../db');
 
-const Weather = sequelize.define(
-  'Weather',
-  {
-    externalLastUpdate: DataTypes.STRING,
-    tempC: DataTypes.FLOAT,
-    tempF: DataTypes.FLOAT,
-    isDay: DataTypes.INTEGER,
-    cloud: DataTypes.INTEGER,
-    conditionText: DataTypes.TEXT,
-    conditionCode: DataTypes.INTEGER,
-    humidity: DataTypes.INTEGER,
-    windK: DataTypes.FLOAT,
-    windM: DataTypes.FLOAT,
-  },
-  {
-    tableName: 'weather',
-  }
+const repository = createRepository({
+  table: 'weather',
+  fields: [
+    'externalLastUpdate', 'tempC', 'tempF', 'isDay', 'cloud', 'conditionText',
+    'conditionCode', 'humidity', 'windK', 'windM',
+  ],
+});
+
+repository.latest = async () => repository.hydrate(
+  await db.get('SELECT * FROM weather ORDER BY createdAt DESC, id DESC LIMIT 1')
 );
 
-module.exports = Weather;
+repository.deleteBeforeId = (id) => db.run('DELETE FROM weather WHERE id < ?', [id]);
+
+module.exports = repository;

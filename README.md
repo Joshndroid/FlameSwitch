@@ -151,7 +151,7 @@ skaffold dev
 
 - Backend
   - Node.js + Express
-  - Sequelize ORM + SQLite
+  - Direct SQLite repositories using `sqlite3`
 - Frontend
   - React
   - Redux
@@ -159,6 +159,14 @@ skaffold dev
 - Deployment
   - Docker
   - Kubernetes
+
+### Database upgrades
+
+FlameSwitch keeps its database in `/app/data/db.sqlite`. At startup it creates
+a versioned copy in `/app/data/db_backups`, then upgrades older schemas in place
+by adding any missing current columns. Existing apps, bookmarks, categories,
+and weather rows are retained, including databases originally created through
+Sequelize. Fresh installations receive the current schema directly.
 
 ### Creating dev environment
 

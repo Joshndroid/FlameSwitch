@@ -1,21 +1,12 @@
 const asyncWrapper = require('../../middleware/asyncWrapper');
 const ErrorResponse = require('../../utils/ErrorResponse');
 const Category = require('../../models/Category');
-const Bookmark = require('../../models/Bookmark');
 
 // @desc      Delete category
 // @route     DELETE /api/categories/:id
 // @access    Public
 const deleteCategory = asyncWrapper(async (req, res, next) => {
-  const category = await Category.findOne({
-    where: { id: req.params.id },
-    include: [
-      {
-        model: Bookmark,
-        as: 'bookmarks',
-      },
-    ],
-  });
+  const category = await Category.findById(req.params.id);
 
   if (!category) {
     return next(
@@ -26,15 +17,7 @@ const deleteCategory = asyncWrapper(async (req, res, next) => {
     );
   }
 
-  category.bookmarks.forEach(async (bookmark) => {
-    await Bookmark.destroy({
-      where: { id: bookmark.id },
-    });
-  });
-
-  await Category.destroy({
-    where: { id: req.params.id },
-  });
+  await Category.deleteWithBookmarks(req.params.id);
 
   res.status(200).json({
     success: true,
