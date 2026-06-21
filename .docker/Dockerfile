@@ -28,7 +28,9 @@ FROM lscr.io/linuxserver/baseimage-alpine:3.22
 # Install node and runtime deps
 RUN apk add --no-cache nodejs curl jq sqlite
 
+ARG APP_VERSION=dev
 ENV NODE_ENV=production
+ENV APP_VERSION=${APP_VERSION}
 
 # Copy built app from builder
 COPY --from=builder /app /app

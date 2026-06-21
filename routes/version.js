@@ -14,7 +14,8 @@ router.get('/', (_req, res) => {
     // package.json
     const pkg = tryReadJSON(path.join(root, 'package.json')) || {};
     const name = typeof pkg?.name === 'string' ? pkg.name : null;
-    const version = typeof pkg?.version === 'string' ? pkg.version : null;
+    const version = process.env.APP_VERSION ||
+      (typeof pkg?.version === 'string' ? pkg.version : null);
 
     // client/versionCheck.json
     const cfg =
