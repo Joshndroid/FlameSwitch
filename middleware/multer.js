@@ -6,6 +6,7 @@ const ErrorResponse = require('../utils/ErrorResponse');
 
 const uploadDir = path.resolve('data/uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
+const realUploadDir = `${fs.realpathSync(uploadDir)}${path.sep}`;
 
 const mimeExtensions = {
   'image/jpeg': '.jpg',
@@ -27,6 +28,14 @@ const uploader = multer({
   fileFilter: (_req, file, cb) => cb(null, Boolean(mimeExtensions[file.mimetype])),
 }).single('icon');
 
+const resolveUploadPath = (filePath) => {
+  const resolvedPath = fs.realpathSync(filePath);
+  if (!resolvedPath.startsWith(realUploadDir)) {
+    throw new ErrorResponse('Invalid upload path', 400);
+  }
+  return resolvedPath;
+};
+
 const hasValidSignature = (filePath) => {
   const buffer = Buffer.alloc(12);
   const fd = fs.openSync(filePath, 'r');
@@ -47,10 +56,24 @@ module.exports = (req, res, next) => {
     if (error) return next(new ErrorResponse(error.message, 400));
     if (!req.file) return next();
 
-    if (!hasValidSignature(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    let uploadedPath;
+    try {
+      uploadedPath = resolveUploadPath(req.file.path);
+    } catch {
       req.file = undefined;
-      return next(new ErrorResponse('Invalid image file', 400));
+      return next(new ErrorResponse('Invalid upload path', 400));
+    }
+
+    try {
+      if (!hasValidSignature(uploadedPath)) {
+        fs.unlinkSync(uploadedPath);
+        req.file = undefined;
+        return next(new ErrorResponse('Invalid image file', 400));
+      }
+    } catch {
+      if (fs.existsSync(uploadedPath)) fs.unlinkSync(uploadedPath);
+      req.file = undefined;
+      return next(new ErrorResponse('Unable to validate image file', 400));
     }
 
     next();
