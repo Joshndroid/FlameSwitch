@@ -42,13 +42,33 @@ const hasValidSignature = (filePath) => {
   );
 };
 
+const getSafeUploadPath = (candidatePath) => {
+  try {
+    const root = fs.realpathSync.native(uploadDir);
+    const resolvedCandidate = path.resolve(candidatePath);
+    const realCandidate = fs.realpathSync.native(resolvedCandidate);
+    const relative = path.relative(root, realCandidate);
+
+    if (relative.startsWith('..') || path.isAbsolute(relative)) return null;
+    return realCandidate;
+  } catch (_err) {
+    return null;
+  }
+};
+
 module.exports = (req, res, next) => {
   uploader(req, res, (error) => {
     if (error) return next(new ErrorResponse(error.message, 400));
     if (!req.file) return next();
 
-    if (!hasValidSignature(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    const safeFilePath = getSafeUploadPath(req.file.path);
+    if (!safeFilePath) {
+      req.file = undefined;
+      return next(new ErrorResponse('Invalid upload path', 400));
+    }
+
+    if (!hasValidSignature(safeFilePath)) {
+      fs.unlinkSync(safeFilePath);
       req.file = undefined;
       return next(new ErrorResponse('Invalid image file', 400));
     }
