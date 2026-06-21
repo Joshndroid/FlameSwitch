@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 const { redactConfig } = require('../controllers/config/getConfig');
 const { passwordsMatch } = require('../controllers/auth/login');
-const rateLimit = require('../middleware/rateLimit');
 
 const runAuth = (authorization) => {
   const req = {
@@ -47,26 +46,15 @@ test('password comparison is exact', () => {
   assert.equal(passwordsMatch(undefined, undefined), false);
 });
 
-test('rate limiter blocks requests over the configured limit', () => {
-  const limiter = rateLimit({ windowMs: 60_000, max: 1, message: 'limited' });
-  const request = { baseUrl: '/test-rate-limit', ip: 'test-client' };
-  let nextCalls = 0;
-  const response = {
-    statusCode: 200,
-    set: () => {},
-    status(code) {
-      this.statusCode = code;
-      return this;
-    },
-    json(body) {
-      this.body = body;
-      return this;
-    },
-  };
+test('rate limiter is mounted after health and static routes', () => {
+  const api = require('../api');
+  const limiterIndex = api.router.stack.findIndex(
+    ({ handle }) => handle === api.apiRateLimit
+  );
+  const jsonParserIndex = api.router.stack.findIndex(
+    ({ name }) => name === 'jsonParser'
+  );
 
-  limiter(request, response, () => nextCalls++);
-  limiter(request, response, () => nextCalls++);
-  assert.equal(nextCalls, 1);
-  assert.equal(response.statusCode, 429);
-  assert.equal(response.body.error, 'limited');
+  assert.ok(limiterIndex > 3);
+  assert.ok(limiterIndex < jsonParserIndex);
 });

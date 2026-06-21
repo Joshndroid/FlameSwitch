@@ -5,5 +5,4 @@ module.exports = {
   upload: require('./multer'),
   requireAuth: require('./requireAuth'),
   requireBody: require('./requireBody'),
-  rateLimit: require('./rateLimit'),
 };

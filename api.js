@@ -1,5 +1,6 @@
 const { join } = require('path');
 const express = require('express');
+const { rateLimit } = require('express-rate-limit');
 const { errorHandler } = require('./middleware');
 const healthRoutes = require('./routes/health');
 const changelog = require('./routes/changelog');
@@ -33,6 +34,20 @@ api.use(
   })
 );
 
+// Protect dynamic handlers that access the database, filesystem, or remote services.
+// Authentication and favicon fetching also have stricter route-specific limits.
+const apiRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 300,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many requests. Try again later.',
+  },
+});
+api.use(apiRateLimit);
+
 // Body parser
 api.use(express.json({ limit: '256kb' }));
 
@@ -58,3 +73,4 @@ api.get(/^\/(?!api)/, (req, res) => {
 api.use(errorHandler);
 
 module.exports = api;
+module.exports.apiRateLimit = apiRateLimit;

@@ -2,9 +2,9 @@ const express = require('express');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { rateLimit } = require('express-rate-limit');
 const App = require('../models/App');
 const Bookmark = require('../models/Bookmark');
-const rateLimit = require('../middleware/rateLimit');
 
 const router = express.Router();
 const cacheDir = path.resolve('data/favicon-cache');
@@ -13,8 +13,13 @@ fs.mkdirSync(cacheDir, { recursive: true });
 
 const faviconRateLimit = rateLimit({
   windowMs: 60 * 1000,
-  max: 60,
-  message: 'Too many favicon requests. Try again later.',
+  limit: 60,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many favicon requests. Try again later.',
+  },
 });
 
 const parseURL = (value) => {
