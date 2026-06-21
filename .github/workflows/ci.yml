@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, master]
+    branches: [main, master, switch]
 
 permissions:
   contents: read
@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Verify LinuxServer container contract
+        run: .github/scripts/verify-container-contract.sh
 
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
@@ -50,6 +53,25 @@ jobs:
 
       - name: Build container
         run: docker build --file .docker/Dockerfile --tag flameswitch:ci .
+
+      - name: Verify container startup
+        run: |
+          container_id=$(docker run --detach \
+            --env PASSWORD=ci-test \
+            --env PUID=1000 \
+            --env PGID=1000 \
+            --security-opt no-new-privileges:true \
+            --publish 127.0.0.1:5005:5005 \
+            flameswitch:ci)
+          trap 'docker rm --force "$container_id"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:5005/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "$container_id"
+          exit 1
 
   dependency-review:
     if: github.event_name == 'pull_request'

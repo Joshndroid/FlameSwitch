@@ -12,14 +12,15 @@ services:
     # secrets:
     #   - password # optional but required for (1)
     environment:
+      - PUID=${PUID:-99}
+      - PGID=${PGID:-100}
+      - TZ=${TZ:-Australia/Brisbane}
       - PASSWORD=${PASSWORD:?Set PASSWORD before starting FlameSwitch}
       # - PASSWORD_FILE=/run/secrets/password # optional but required for (1)
       # - WEATHER_CACHE_HOURS=6  #  optional to cut down calls to weather api
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
     tmpfs:
       - /tmp
 

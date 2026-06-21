@@ -15,6 +15,19 @@ Switch Branch Changes over spiicytuna/master
 - Updated dependencies and security patches
 - Drop‑in compatible with classic Flame configs and themes
 
+### Container architecture contract
+
+FlameSwitch is intentionally built on LinuxServer.io's Alpine base image and
+uses s6-overlay with the mapped `abc` user. This is a core project requirement,
+not an incidental implementation detail: it provides the PUID/PGID ownership
+handling and service supervision that make the image straightforward on Unraid.
+
+The LinuxServer base-image version may be upgraded, but replacing the base,
+bypassing s6, removing PUID/PGID support, or starting Node directly is an
+architecture change and must not happen as part of routine maintenance. CI and
+release builds run `.github/scripts/verify-container-contract.sh` to enforce
+these invariants before an image can be published.
+
 ## Abstract-Spiicy (where I forked)
 
 _I am not the creator of Flame but I do want to keep it alive if only for my use.  In order to keep it alive, being the original dev has not updated since 2023, security patches and updates need to be applied.  This "master" branch is just "Legacy" Flame  {`docker pull ghcr.io/spiicytuna/flame:latest`}  with security updates and patches => so a fork + security => build => post here for others to use.  If you want to get spiicy (pun intended haha) [tuna-combo](https://github.com/spiicytuna/flame/tree/tuna-combo)  {`git pull ghcr.io/spiicytuna/flame-dev:latest`}  has customization that I have applied for my own use cases e.g. categories for the Application section, weather forecasts, etc._
@@ -52,9 +65,11 @@ docker pull ghcr.io/joshndroid/flame-switch:latest
 docker run -p 5005:5005 \
   -v /path/to/data:/app/data \
   -v /path/to/flame_password:/run/secrets/password:ro \
+  -e PUID=99 \
+  -e PGID=100 \
+  -e TZ=Australia/Brisbane \
   -e PASSWORD_FILE=/run/secrets/password \
   --security-opt=no-new-privileges:true \
-  --cap-drop=ALL \
   ghcr.io/joshndroid/flame-switch:latest
 ```
 
@@ -65,13 +80,13 @@ git clone https://github.com/joshndroid/flame-switch
 
 cd flame-switch
 
-git checkout master
+git checkout switch
 
-# build multiarch image for amd64, armv7 and arm64
+# build multiarch image for amd64 and arm64
 # building failed multiple times with 2GB memory usage limit so you might want to increase it
 docker buildx build \
   --platform linux/arm64,linux/amd64 \
-  -f .docker/Dockerfile.multiarch \
+  -f .docker/Dockerfile \
   -t ghcr.io/joshndroid/flame-switch:latest \
   .
 ```
@@ -92,6 +107,9 @@ services:
       # - /var/log/flame-dash:/app/log  #  optional external access.log remote logging or fail2ban
       # - /var/run/docker.sock:/var/run/docker.sock # optional but required for Docker integration
     environment:
+      - PUID=${PUID:-99}
+      - PGID=${PGID:-100}
+      - TZ=${TZ:-Australia/Brisbane}
       - PASSWORD=${PASSWORD:?Set PASSWORD before starting FlameSwitch}
       # - WEATHER_CACHE_HOURS=6  #  optional to cut down calls to weather api
     healthcheck:
@@ -102,8 +120,6 @@ services:
       start_period: 30s
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
     tmpfs:
       - /tmp
 ```

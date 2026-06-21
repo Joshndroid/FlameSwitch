@@ -23,20 +23,24 @@ RUN mkdir -p ./public && mv ./client/dist/* ./public
 RUN rm -rf ./client
 
 # ---- Final Stage ----
-FROM node:22-alpine
+# ARCHITECTURE CONTRACT: FlameSwitch is intentionally an Unraid-friendly
+# LinuxServer/s6 container. Version bumps are welcome; replacing this image or
+# bypassing s6 must be treated as an explicit architecture change. CI enforces it.
+FROM lscr.io/linuxserver/baseimage-alpine:3.22
 
 # Install node and runtime deps
-RUN apk add --no-cache curl sqlite
+RUN apk add --no-cache nodejs curl jq sqlite
 
 ARG APP_VERSION=dev
 ENV NODE_ENV=production
 ENV APP_VERSION=${APP_VERSION}
 
 # Copy built app from builder
-COPY --from=builder --chown=node:node /app /app
-RUN mkdir -p /app/data /app/log && chown -R node:node /app/data /app/log /app/public
+COPY --from=builder /app /app
+WORKDIR /app
 
-USER node
+# Register the Flame service with s6-overlay. The service runs as LinuxServer's
+# abc user after its PUID/PGID and mounted-volume permissions are initialized.
+COPY root/ /
 
 EXPOSE 5005
-CMD ["node", "server.js"]
