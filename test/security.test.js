@@ -5,6 +5,7 @@ const auth = require('../middleware/auth');
 const { redactConfig } = require('../controllers/config/getConfig');
 const { passwordsMatch } = require('../controllers/auth/login');
 const { slugify } = require('../db/utils/slugify');
+const trustProxy = require('../utils/trustProxy');
 
 const runAuth = (authorization) => {
   const req = {
@@ -51,6 +52,14 @@ test('database backup names do not depend on a .env VERSION', () => {
   assert.equal(slugify('v1.6.1'), 'db-v161-backup.sqlite');
   assert.equal(slugify('../../outside'), 'db-outside-backup.sqlite');
   assert.match(slugify(), /^db-[a-zA-Z0-9_-]+-backup\.sqlite$/);
+});
+
+test('reverse proxy trust is explicit and bounded', () => {
+  assert.equal(trustProxy(undefined), false);
+  assert.equal(trustProxy('false'), false);
+  assert.equal(trustProxy('0'), false);
+  assert.equal(trustProxy('true'), 1);
+  assert.equal(trustProxy('2'), 2);
 });
 
 test('rate limiter is mounted after health and static routes', () => {

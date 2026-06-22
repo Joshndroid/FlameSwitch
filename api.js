@@ -5,8 +5,9 @@ const { errorHandler } = require('./middleware');
 const healthRoutes = require('./routes/health');
 const changelog = require('./routes/changelog');
 const version = require('./routes/version');
+const trustProxy = require('./utils/trustProxy');
 const api = express();
-api.set('trust proxy', process.env.TRUST_PROXY === 'true' ? 1 : false);
+api.set('trust proxy', trustProxy(process.env.TRUST_PROXY));
 
 api.use((_req, res, next) => {
   res.set({

@@ -111,6 +111,7 @@ services:
       - PGID=${PGID:-100}
       - TZ=${TZ:-Australia/Brisbane}
       - PASSWORD=${PASSWORD:?Set PASSWORD before starting FlameSwitch}
+      # - TRUST_PROXY=true # one reverse proxy; use 2 for two trusted proxy hops
       # - WEATHER_CACHE_HOURS=6  #  optional to cut down calls to weather api
     healthcheck:
       test: ["CMD", "curl", "-fs", "http://localhost:5005/health"]
@@ -123,6 +124,11 @@ services:
     tmpfs:
       - /tmp
 ```
+
+When FlameSwitch is accessed through a reverse proxy, set `TRUST_PROXY=true`
+for one proxy hop. For a trusted chain of two proxies, set `TRUST_PROXY=2`, and
+so on. Leave it unset/false for direct access. The hop count ensures rate limits
+use the real client address without blindly trusting spoofable forwarded headers.
 
 ##### Docker Secrets
 
