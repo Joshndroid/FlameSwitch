@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import axios from 'axios';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router';
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux';

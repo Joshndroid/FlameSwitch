@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { Navigate, useLocation } from 'react-router-dom'; // updated for v6 pattern
+import { Navigate, useLocation } from 'react-router'; // updated for v6 pattern
 import { State } from '../../store/reducers';
 
 interface Props {

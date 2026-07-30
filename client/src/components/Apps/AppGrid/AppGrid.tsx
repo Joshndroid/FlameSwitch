@@ -1,5 +1,5 @@
 import classes from './AppGrid.module.css';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { App } from '../../../interfaces/App';
 
 import { AppCard } from '../AppCard/AppCard';

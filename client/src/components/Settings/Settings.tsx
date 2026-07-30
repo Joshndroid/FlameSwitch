@@ -1,4 +1,4 @@
-import { NavLink, Link, Routes, Route } from 'react-router-dom';
+import { NavLink, Link, Routes, Route } from 'react-router';
 
 // Redux
 import { useSelector } from 'react-redux';
