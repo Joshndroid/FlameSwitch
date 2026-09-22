@@ -34,16 +34,15 @@ export const Header = (): JSX.Element => {
   return (
     <header className={classes.Header}>
       {(!hideDate || showTime) && <p>{dateTime}</p>}
+      {!hideHeader && (
+        <div className={classes.HeaderMain}>
+          <h1>{greeting}</h1>
+        </div>
+      )}
 
       <Link to="/settings" className={classes.SettingsLink}>
         Go to Settings
       </Link>
-
-      {!hideHeader && (
-        <span className={classes.HeaderMain}>
-          <h1>{greeting}</h1>
-        </span>
-      )}
     </header>
   );
 };

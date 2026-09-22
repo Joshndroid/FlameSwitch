@@ -1,31 +1,47 @@
+.Header {
+  position: relative;
+}
+
 .Header h1 {
   color: var(--color-primary);
   font-weight: 700;
   font-size: 4em;
-  display: inline-block;
+  line-height: 1.05;
 }
 
 .Header p {
   color: var(--color-primary);
   font-weight: 300;
   text-transform: uppercase;
-  height: 30px;
+  line-height: 1.2;
+  opacity: 0.8;
 }
 
 .HeaderMain {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
+}
+
+.Header p + .HeaderMain {
+  margin-top: 0.75rem;
 }
 
 .SettingsLink {
-  visibility: visible;
+  position: absolute;
+  top: 0;
+  right: 0;
   color: var(--color-accent);
 }
 
 @media (min-width: 769px) {
   .SettingsLink {
-    visibility: hidden;
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .Header h1 {
+    font-size: clamp(2.5rem, 13vw, 4em);
   }
 }

@@ -139,8 +139,10 @@ export const Home = (): JSX.Element => {
         <div></div>
       )}
 
-      <Header />
-      <WeatherGlance />
+      <div className={classes.Overview}>
+        <Header />
+        <WeatherGlance />
+      </div>
 
       {!isAuthenticated &&
       !pinnedVisibleApps.length &&
