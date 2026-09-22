@@ -1,0 +1,33 @@
+.Card {
+  color: var(--color-primary);
+  border: 1px solid var(--color-accent);
+  border-radius: 16px;
+  background-color: var(--color-background);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--color-accent) 13%, var(--color-background)), var(--color-background));
+  margin: -1rem 0 2rem;
+  padding: 18px 22px;
+  max-width: 980px;
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--color-primary) 7%, transparent);
+}
+.Current { display: flex; align-items: center; gap: 18px; }
+.Mark { width: 46px; height: 46px; color: var(--color-accent); flex: none; }
+.Outside { display: flex; flex-direction: column; min-width: 100px; }
+.Outside strong { font-size: 1.9rem; line-height: 1.1; font-weight: 700; }
+.Outside span { font-size: .8rem; text-transform: capitalize; opacity: .75; }
+.Card small { font-size: .64rem; font-weight: 700; letter-spacing: .11em; opacity: .65; }
+.Details { display: flex; gap: 24px; padding-left: 20px; border-left: 1px solid var(--color-accent); margin-left: 8px; }
+.Details div { display: flex; flex-direction: column; gap: 3px; }
+.Details b { font-size: 1rem; }
+.Summary { font-size: .85rem; line-height: 1.4; margin: 13px 0 0; opacity: .85; }
+.Forecast { display: flex; gap: 16px; border-top: 1px solid var(--color-accent); margin-top: 16px; padding-top: 13px; overflow-x: auto; }
+.Day { min-width: 80px; display: grid; grid-template-columns: 24px auto; align-items: center; column-gap: 6px; }
+.Day small { grid-column: 1 / -1; white-space: nowrap; }
+.Day svg { width: 22px; height: 22px; }
+.Day b { font-size: .95rem; }
+.Day span { grid-column: 2; font-size: .75rem; opacity: .65; }
+.Unavailable { color: var(--color-primary); opacity: .6; font-size: .8rem; margin: -1rem 0 2rem; }
+@media (max-width: 600px) {
+  .Card { margin-top: 0; padding: 16px; }
+  .Current { flex-wrap: wrap; gap: 12px; }
+  .Details { width: 100%; margin: 6px 0 0; padding: 12px 0 0; border-left: 0; border-top: 1px solid var(--color-accent); }
+}

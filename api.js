@@ -55,6 +55,7 @@ api.use(express.json({ limit: '256kb' }));
 // Link controllers with routes
 api.use('/api/apps', require('./routes/apps'));
 api.use('/api/config', require('./routes/config'));
+api.use('/api/home-assistant', require('./routes/homeAssistant'));
 api.use('/api/categories', require('./routes/category'));
 api.use('/api/bookmarks', require('./routes/bookmark'));
 api.use('/api/queries', require('./routes/queries'));

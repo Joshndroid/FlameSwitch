@@ -16,6 +16,7 @@ import { Themer } from './Themer/Themer';
 import { AppDetails } from './AppDetails/AppDetails';
 import { AuthForm } from './AppDetails/AuthForm/AuthForm';
 import { StyleSettings } from './StyleSettings/StyleSettings';
+import { HomeAssistantSettings } from './HomeAssistantSettings/HomeAssistantSettings';
 
 export const Settings = (): JSX.Element => {
   const { isAuthenticated } = useSelector((state: State) => state.auth);
@@ -48,6 +49,9 @@ export const Settings = (): JSX.Element => {
             >
               Docker
             </NavLink>
+            <NavLink to="/settings/home-assistant" className={navClassName}>
+              Weather
+            </NavLink>
             <NavLink
               to="/settings/theme"
               className={navClassName}
@@ -75,6 +79,7 @@ export const Settings = (): JSX.Element => {
               <Route path="/app" element={<GeneralSettings />} />
               <Route path="/ui" element={<UISettings />} />
               <Route path="/docker" element={<DockerSettings />} />
+              <Route path="/home-assistant" element={<HomeAssistantSettings />} />
               <Route path="/theme" element={<Themer />} />
 	      <Route path="/css" element={<StyleSettings />} />
               <Route path="/details" element={<AppDetails />} />

@@ -21,6 +21,7 @@ import { AppGrid } from '../Apps/AppGrid/AppGrid';
 import { BookmarkGrid } from '../Bookmarks/BookmarkGrid/BookmarkGrid';
 import { SearchBar } from '../SearchBar/SearchBar';
 import { Header } from './Header/Header';
+import { WeatherGlance } from './WeatherGlance/WeatherGlance';
 
 // Utils
 import { escapeRegex } from '../../utility';
@@ -139,6 +140,7 @@ export const Home = (): JSX.Element => {
       )}
 
       <Header />
+      <WeatherGlance />
 
       {!isAuthenticated &&
       !pinnedVisibleApps.length &&

@@ -198,6 +198,12 @@ npm run dev
 
 ## Usage
 
+### Home Assistant weather glance
+
+Open **Settings → Weather**, enter the local IP address of Home Assistant (for example `http://192.168.1.10:8123`) and a Home Assistant long-lived access token, then save. Refresh the entity list to pick your outside and inside readings, a 24-hour rain total, an optional short description such as BOM `short_text`, and a `weather.*` entity for daily forecasts. Choose 3–5 days ahead and save again. Leave any source blank to hide that part of the card.
+
+The app contacts only the Home Assistant address you configure and refreshes readings about once a minute. The token is kept in `data/home-assistant.json` on the server and is never returned to the browser after saving. Selected readings are visible to everyone who can view the homepage. Forecast availability depends on the selected Home Assistant weather entity; Home Assistant integrations may make their own external requests.
+
 
 ### Search bar
 
