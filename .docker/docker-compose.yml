@@ -18,7 +18,6 @@ services:
       - PASSWORD=${PASSWORD:?Set PASSWORD before starting FlameSwitch}
       # - TRUST_PROXY=true # one reverse proxy; use 2 for two trusted proxy hops
       # - PASSWORD_FILE=/run/secrets/password # optional but required for (1)
-      # - WEATHER_CACHE_HOURS=6  #  optional to cut down calls to weather api
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true

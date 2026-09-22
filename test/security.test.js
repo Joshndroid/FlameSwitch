@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
-const { redactConfig } = require('../controllers/config/getConfig');
+const { withoutWeatherConfig } = require('../utils/loadConfig');
 const { passwordsMatch } = require('../controllers/auth/login');
 const { slugify } = require('../db/utils/slugify');
 const trustProxy = require('../utils/trustProxy');
@@ -33,13 +33,9 @@ test('authentication rejects an invalid token without throwing', () => {
   assert.equal(req.isAuthenticated, false);
 });
 
-test('public config never exposes the weather API key', () => {
+test('removed configuration fields are not returned', () => {
   const config = { WEATHER_API_KEY: 'private-value', customTitle: 'Flame' };
-  assert.deepEqual(redactConfig(config, false), {
-    WEATHER_API_KEY: '__configured__',
-    customTitle: 'Flame',
-  });
-  assert.equal(redactConfig(config, true).WEATHER_API_KEY, 'private-value');
+  assert.deepEqual(withoutWeatherConfig(config), { customTitle: 'Flame' });
 });
 
 test('password comparison is exact', async () => {

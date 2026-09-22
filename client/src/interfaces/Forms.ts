@@ -1,21 +1,3 @@
-import { WeatherData } from '../types';
-
-export interface WeatherForm {
-  WEATHER_API_KEY: string;
-  lat: number;
-  long: number;
-  isCelsius: boolean;
-  weatherData: WeatherData;
-  weatherMode: 'geoip' | 'fixed';
-  weatherWidgetIcon: number;
-  showExtraWeatherColumn: boolean;
-  extraWeatherTop: string;
-  extraWeatherBottom: string;
-  forecastEnable: boolean;
-  forecastDays: number;
-  forecastCache: boolean;
-}
-
 export interface GeneralForm {
   defaultSearchProvider: string;
   secondarySearchProvider: string;

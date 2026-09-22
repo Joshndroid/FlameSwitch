@@ -5,7 +5,6 @@ export * from './Notification/Notification';
 export * from './Modal/Modal';
 export * from './Layout/Layout';
 export * from './Icons/Icon/Icon';
-export * from './Icons/WeatherIcon/WeatherIcon';
 export * from './Icons/ActionIcons/ActionIcons';
 export * from './Headlines/Headline/Headline';
 export * from './Headlines/SectionHeadline/SectionHeadline';

@@ -45,18 +45,6 @@ const createLegacyDatabase = (storage) =>
         createdAt TEXT NOT NULL,
         updatedAt TEXT NOT NULL
       );
-      CREATE TABLE weather (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        externalLastUpdate TEXT,
-        tempC REAL,
-        tempF REAL,
-        isDay INTEGER,
-        cloud INTEGER,
-        conditionText TEXT,
-        conditionCode INTEGER,
-        createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
-      );
       CREATE TABLE SequelizeMeta (name TEXT NOT NULL UNIQUE PRIMARY KEY);
       INSERT INTO SequelizeMeta (name) VALUES ('00_initial.js');
       INSERT INTO categories (name, createdAt, updatedAt)

@@ -11,7 +11,6 @@ import classes from './Settings.module.css';
 import { Container } from '../UI';
 import { GeneralSettings } from './GeneralSettings/GeneralSettings';
 import { UISettings } from './UISettings/UISettings';
-import { WeatherSettings } from './WeatherSettings/WeatherSettings';
 import { DockerSettings } from './DockerSettings/DockerSettings';
 import { Themer } from './Themer/Themer';
 import { AppDetails } from './AppDetails/AppDetails';
@@ -42,12 +41,6 @@ export const Settings = (): JSX.Element => {
               className={navClassName}
             >
               Interface
-            </NavLink>
-            <NavLink
-              to="/settings/weather"
-              className={navClassName}
-            >
-              Weather
             </NavLink>
             <NavLink
               to="/settings/docker"
@@ -81,7 +74,6 @@ export const Settings = (): JSX.Element => {
             <Routes>
               <Route path="/app" element={<GeneralSettings />} />
               <Route path="/ui" element={<UISettings />} />
-              <Route path="/weather" element={<WeatherSettings />} />
               <Route path="/docker" element={<DockerSettings />} />
               <Route path="/theme" element={<Themer />} />
 	      <Route path="/css" element={<StyleSettings />} />

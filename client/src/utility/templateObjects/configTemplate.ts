@@ -1,10 +1,6 @@
 import { Config } from '../../interfaces';
 
 export const configTemplate: Config = {
-  WEATHER_API_KEY: '',
-  lat: 0,
-  long: 0,
-  isCelsius: true,
   customTitle: 'Flame',
   pinAppsByDefault: true,
   pinCategoriesByDefault: true,
@@ -31,16 +27,7 @@ export const configTemplate: Config = {
   showTime: false,
   defaultTheme: 'tron',
   isKilometer: true,
-  weatherData: 'cloud',
   hideDate: false,
-  weatherMode: 'geoip',
-  weatherWidgetIcon: 65,
-  showExtraWeatherColumn: false,
-  extraWeatherTop: 'uv',
-  extraWeatherBottom: 'gust_mph',
-  forecastEnable: false,
-  forecastDays: 3,
-  forecastCache: false,
   automaticUpdates: true,
   useDefaults: true,
   updateUrl: '',

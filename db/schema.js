@@ -14,11 +14,6 @@ const currentColumns = {
     isPublic: 'INTEGER DEFAULT 1',
     section: "TEXT DEFAULT 'bookmarks'",
   },
-  weather: {
-    humidity: 'INTEGER',
-    windK: 'REAL',
-    windM: 'REAL',
-  },
 };
 
 const ensureColumns = async ({ all, run }) => {
@@ -69,22 +64,6 @@ module.exports = async ({ all, exec, run }) => {
       isPublic INTEGER DEFAULT 1,
       description TEXT NOT NULL DEFAULT '',
       invertIcon INTEGER NOT NULL DEFAULT 0,
-      createdAt TEXT NOT NULL,
-      updatedAt TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS weather (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      externalLastUpdate TEXT,
-      tempC REAL,
-      tempF REAL,
-      isDay INTEGER,
-      cloud INTEGER,
-      conditionText TEXT,
-      conditionCode INTEGER,
-      humidity INTEGER,
-      windK REAL,
-      windM REAL,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL
     );

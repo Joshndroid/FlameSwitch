@@ -1,10 +1,4 @@
-import { WeatherData } from '../types';
-
 export interface Config {
-  WEATHER_API_KEY: string;
-  lat: number;
-  long: number;
-  isCelsius: boolean;
   customTitle: string;
   pinAppsByDefault: boolean;
   pinCategoriesByDefault: boolean;
@@ -30,16 +24,7 @@ export interface Config {
   showTime: boolean;
   defaultTheme: string;
   isKilometer: boolean;
-  weatherData: WeatherData;
   hideDate: boolean;
-  weatherMode: 'geoip' | 'fixed';
-  weatherWidgetIcon?: number;
-  showExtraWeatherColumn: boolean;
-  extraWeatherTop: string;
-  extraWeatherBottom: string;
-  forecastEnable?: boolean;
-  forecastDays: number;
-  forecastCache: boolean;
   automaticUpdates?: boolean;
   useDefaults?: boolean;
   updateUrl?: string;

@@ -3,7 +3,6 @@ import {
   UISettingsForm,
   GeneralForm,
   ThemeSettingsForm,
-  WeatherForm,
 } from '../../interfaces';
 
 export const uiSettingsTemplate: UISettingsForm = {
@@ -21,23 +20,6 @@ export const uiSettingsTemplate: UISettingsForm = {
   hideSearch: false,
   disableAutofocus: false,
 };
-
-export const weatherSettingsTemplate: WeatherForm = {
-  WEATHER_API_KEY: '',
-  lat: 0,
-  long: 0,
-  isCelsius: true,
-  weatherData: 'humidity',
-  weatherMode: 'geoip',
-  weatherWidgetIcon: 65,
-  showExtraWeatherColumn: false,
-  extraWeatherTop: 'uv',
-  extraWeatherBottom: 'gust_mph',
-  forecastEnable: false,
-  forecastDays: 3,
-  forecastCache: false,
-};
-
 
 export const generalSettingsTemplate: GeneralForm = {
   searchSameTab: false,

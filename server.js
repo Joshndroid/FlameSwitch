@@ -1,5 +1,4 @@
 require('dotenv').config({ quiet: true });
-const http = require('http');
 
 // Secret stuff 
 const { initializeSecret } = require('./utils/secret');
@@ -10,9 +9,6 @@ const { connectDB } = require('./db');
 
 // Server
 const api = require('./api');
-const jobs = require('./utils/jobs');
-const Socket = require('./Socket');
-const Sockets = require('./Sockets');
 
 // Utils
 const initApp = require('./utils/init');
@@ -25,17 +21,7 @@ const logger = new Logger();
   // Init app
   await initApp();
   await connectDB();
-  await jobs();
-
-  // Create server for Express API and WebSockets
-  const server = http.createServer();
-  server.on('request', api);
-
-  // Register weatherSocket
-  const weatherSocket = new Socket(server);
-  Sockets.registerSocket('weather', weatherSocket);
-
-  server.listen(PORT, () => {
+  api.listen(PORT, () => {
     logger.log(
       `Server is running on port ${PORT} in ${process.env.NODE_ENV} mode`
     );

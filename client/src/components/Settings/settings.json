@@ -16,11 +16,6 @@
       "authRequired": true
     },
     {
-      "name": "Weather",
-      "dest": "/settings/weather",
-      "authRequired": true
-    },
-    {
       "name": "Docker",
       "dest": "/settings/docker",
       "authRequired": true

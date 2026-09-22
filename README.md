@@ -30,7 +30,7 @@ these invariants before an image can be published.
 
 ## Abstract-Spiicy (where I forked)
 
-_I am not the creator of Flame but I do want to keep it alive if only for my use.  In order to keep it alive, being the original dev has not updated since 2023, security patches and updates need to be applied.  This "master" branch is just "Legacy" Flame  {`docker pull ghcr.io/spiicytuna/flame:latest`}  with security updates and patches => so a fork + security => build => post here for others to use.  If you want to get spiicy (pun intended haha) [tuna-combo](https://github.com/spiicytuna/flame/tree/tuna-combo)  {`git pull ghcr.io/spiicytuna/flame-dev:latest`}  has customization that I have applied for my own use cases e.g. categories for the Application section, weather forecasts, etc._
+_I am not the creator of Flame but I do want to keep it alive if only for my use.  In order to keep it alive, being the original dev has not updated since 2023, security patches and updates need to be applied.  This "master" branch is just "Legacy" Flame  {`docker pull ghcr.io/spiicytuna/flame:latest`}  with security updates and patches => so a fork + security => build => post here for others to use.  If you want to get spiicy (pun intended haha) [tuna-combo](https://github.com/spiicytuna/flame/tree/tuna-combo)  {`git pull ghcr.io/spiicytuna/flame-dev:latest`}  has customization that I have applied for my own use cases e.g. categories for the Application section._
 
 ## Description
 
@@ -44,7 +44,6 @@ Flame is very easy to setup and use. With built-in editors, it allows you to set
 - 🔍 Integrated search bar with local filtering, 11 web search providers and ability to add your own
 - 🔑 Authentication system to protect your settings, apps and bookmarks
 - 🔨 Dozens of options to customize Flame interface to your needs, including support for custom CSS, 15 built-in color themes and custom theme builder
-- ☀️ Weather widget with current temperature, cloud coverage and animated weather status
 - 🐳 Docker integration to automatically pick and add apps based on their labels
 
 ## Installation
@@ -112,7 +111,6 @@ services:
       - TZ=${TZ:-Australia/Brisbane}
       - PASSWORD=${PASSWORD:?Set PASSWORD before starting FlameSwitch}
       # - TRUST_PROXY=true # one reverse proxy; use 2 for two trusted proxy hops
-      # - WEATHER_CACHE_HOURS=6  #  optional to cut down calls to weather api
     healthcheck:
       test: ["CMD", "curl", "-fs", "http://localhost:5005/health"]
       interval: 60s
@@ -171,7 +169,7 @@ skaffold dev
 FlameSwitch keeps its database in `/app/data/db.sqlite`. At startup it creates
 a versioned copy in `/app/data/db_backups`, then upgrades older schemas in place
 by adding any missing current columns. Existing apps, bookmarks, categories,
-and weather rows are retained, including databases originally created through
+and other existing rows are retained, including databases originally created through
 Sequelize. Fresh installations receive the current schema directly.
 
 ### Creating dev environment
@@ -208,13 +206,6 @@ npm run dev
 The default search setting is to search through all your apps and bookmarks. If you want to search using specific search engine, you need to type your search query with selected prefix. For example, to search for "what is docker" using google search you would type: `/g what is docker`.
 
 For list of supported search engines, shortcuts and more about searching functionality visit the original [project wiki](https://github.com/pawelmalak/flame/wiki/Search-bar) (pawelmalak).
-
-### Setting up weather module
-
-1. Obtain API Key from [Weather API](https://www.weatherapi.com/pricing.aspx).
-   > Free plan allows for 1M calls per month. Flame is making less then 3K API calls per month.
-2. Get lat/long for your location. You can get them from [latlong.net](https://www.latlong.net/convert-address-to-lat-long.html).
-3. Enter and save data. Weather widget will now update and should be visible on Home page.
 
 ### Docker integration
 

@@ -107,7 +107,7 @@ export const UISettings = (): JSX.Element => {
       {/* HIDE HEADER */}
       <InputGroup>
         <label htmlFor="hideHeader">
-          Hide headline (greetings and weather)
+          Hide headline and greeting
         </label>
         <select
           id="hideHeader"

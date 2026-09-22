@@ -11,7 +11,7 @@ api.set('trust proxy', trustProxy(process.env.TRUST_PROXY));
 
 api.use((_req, res, next) => {
   res.set({
-    'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: http: https:; font-src 'self'; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+    'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: http: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'X-Content-Type-Options': 'nosniff',
@@ -55,7 +55,6 @@ api.use(express.json({ limit: '256kb' }));
 // Link controllers with routes
 api.use('/api/apps', require('./routes/apps'));
 api.use('/api/config', require('./routes/config'));
-api.use('/api/weather', require('./routes/weather'));
 api.use('/api/categories', require('./routes/category'));
 api.use('/api/bookmarks', require('./routes/bookmark'));
 api.use('/api/queries', require('./routes/queries'));
