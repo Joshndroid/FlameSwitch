@@ -6,7 +6,7 @@ services:
       - /path/to/host/data:/app/data
       # - /path/to/favicon.ico:/app/public/icons/favicon.ico  #  optional change to your own favicon.co
       # - /var/log/flame-dash:/app/log  #  optional external access.log remote logging or fail2ban
-      # - /var/run/docker.sock:/var/run/docker.sock # optional but required for Docker integration
+      # - /var/run/docker.sock:/var/run/docker.sock # enable only for Docker app discovery; grants Docker daemon access
     ports:
       - 5005:5005
     # secrets:

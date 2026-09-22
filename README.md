@@ -105,7 +105,7 @@ services:
       - /path/to/data:/app/data
       # - /path/to/favicon.ico:/app/public/icons/favicon.ico  #  optional change to your own favicon.co
       # - /var/log/flame-dash:/app/log  #  optional external access.log remote logging or fail2ban
-      # - /var/run/docker.sock:/var/run/docker.sock # optional but required for Docker integration
+      # - /var/run/docker.sock:/var/run/docker.sock # enable only for Docker app discovery; grants Docker daemon access
     environment:
       - PUID=${PUID:-99}
       - PGID=${PGID:-100}
@@ -229,7 +229,9 @@ labels:
 # - flame.icon=custom to make changes in app. ie: custom icon upload
 ```
 
-> "Use Docker API" option must be enabled for this to work. You can find it in Settings > Docker
+Docker discovery is off by default. To use it, mount the Docker socket and enable
+"Use Docker API" in Settings > Docker. Leave the socket unmounted otherwise:
+access to it grants control of the host's Docker daemon.
 
 You can also set up different apps in the same label adding `;` between each one.
 

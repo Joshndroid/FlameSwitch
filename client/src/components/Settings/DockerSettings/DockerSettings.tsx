@@ -73,6 +73,10 @@ export const DockerSettings = (): JSX.Element => {
       {/* USE DOCKER API */}
       <InputGroup>
         <label htmlFor="dockerApps">Use Docker API</label>
+        <p>
+          Leave this off unless you use Docker app discovery. It requires access
+          to the Docker daemon.
+        </p>
         <select
           id="dockerApps"
           name="dockerApps"

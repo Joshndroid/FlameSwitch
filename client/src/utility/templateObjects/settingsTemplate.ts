@@ -51,7 +51,7 @@ export const generalSettingsTemplate: GeneralForm = {
 };
 
 export const dockerSettingsTemplate: DockerSettingsForm = {
-  dockerApps: true,
+  dockerApps: false,
   dockerHost: 'localhost',
   kubernetesApps: true,
   unpinStoppedApps: true,
