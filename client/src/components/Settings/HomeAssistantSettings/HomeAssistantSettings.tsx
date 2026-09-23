@@ -20,7 +20,7 @@ type Entity = { id: string; name: string; unit: string };
 
 const empty: Settings = {
   url: '', tokenConfigured: false, days: 3, forecastMode: 'weather',
-  forecastEntities: ['', '', '', '', ''],
+  forecastEntities: ['', '', '', '', '', '', ''],
   bomForecastEntity: '',
   entities: { inside: '', outside: '', rain: '', shortText: '', forecast: '' },
   fuel: {
@@ -61,8 +61,8 @@ export const HomeAssistantSettings = (): JSX.Element => {
       .then(({ data }) => {
         setSettings({ ...empty, ...data.data,
           entities: { ...empty.entities, ...data.data.entities },
-          forecastEntities: [...empty.forecastEntities,
-            ...(data.data.forecastEntities || [])].slice(0, 5),
+          forecastEntities: empty.forecastEntities.map((_, index) =>
+            data.data.forecastEntities?.[index] || ''),
           fuel: {
             ...empty.fuel,
             ...(data.data.fuel || {}),
@@ -156,8 +156,8 @@ export const HomeAssistantSettings = (): JSX.Element => {
         <select id="ha-days" value={settings.days}
           onChange={(event) => setSettings({ ...settings, days: Number(event.target.value) })}>
           <option value={3}>3 days</option>
-          <option value={4}>4 days</option>
           <option value={5}>5 days</option>
+          <option value={7}>7 days</option>
         </select>
       </InputGroup>
       {settings.forecastMode === 'weather' ? <InputGroup>

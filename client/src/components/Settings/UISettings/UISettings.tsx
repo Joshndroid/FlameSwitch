@@ -20,10 +20,15 @@ const headerLayouts = [
   {
     value: 'balanced',
     name: 'Balanced',
-    detail: 'Weather beside the greeting',
+    detail: 'Greeting above a compact widget row',
   },
-  { value: 'stacked', name: 'Stacked', detail: 'Weather below the greeting' },
+  { value: 'stacked', name: 'Stacked', detail: 'Widgets in a vertical list below the greeting' },
   { value: 'centered', name: 'Centered', detail: 'A centered compact header' },
+  {
+    value: 'widgets-right',
+    name: 'Widgets on right',
+    detail: 'Main content left with a subtle widget rail',
+  },
 ] as const;
 
 const contentLayouts = [

@@ -17,12 +17,13 @@
 .Details div { display: flex; flex-direction: column; gap: 3px; }
 .Details b { font-size: 1rem; }
 .Summary { font-size: .85rem; line-height: 1.4; margin: 10px 0 0; opacity: .85; }
-.Forecast { display: flex; gap: 16px; max-width: 100%; border-top: 1px solid var(--color-accent); margin-top: 12px; padding-top: 12px; overflow-x: auto; }
-.Day { min-width: 80px; display: grid; grid-template-columns: 24px auto; align-items: center; column-gap: 6px; }
-.Day small { grid-column: 1 / -1; white-space: nowrap; }
+.Forecast { display: grid; gap: clamp(4px, 1vw, 12px); width: 100%; max-width: 100%; border-top: 1px solid var(--color-accent); margin-top: 12px; padding-top: 12px; }
+.Day { min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; }
+.Day small { white-space: nowrap; }
 .Day svg { width: 22px; height: 22px; }
 .Day b { font-size: .95rem; }
-.Day span { grid-column: 2; font-size: .75rem; opacity: .65; }
+.Day span { font-size: .75rem; opacity: .65; }
+.Day small:last-child { font-size: .55rem; letter-spacing: .04em; }
 .Unavailable { color: var(--color-primary); opacity: .6; font-size: .8rem; }
 @media (max-width: 600px) {
   .Current { flex-wrap: wrap; gap: 12px; }

@@ -1,4 +1,4 @@
-export type HomeLayout = 'balanced' | 'stacked' | 'centered';
+export type HomeLayout = 'balanced' | 'stacked' | 'centered' | 'widgets-right';
 export type ContentLayout = 'relaxed' | 'balanced' | 'compact';
 export type WidgetOrder = 'weather-first' | 'fuel-first';
 

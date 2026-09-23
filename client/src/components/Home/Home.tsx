@@ -140,74 +140,80 @@ export const Home = (): JSX.Element => {
         <div></div>
       )}
 
-      <div
-        className={`${classes.Overview} ${
-          homeLayout === 'stacked'
-            ? classes.OverviewStacked
-            : homeLayout === 'centered'
-              ? classes.OverviewCentered
-              : classes.OverviewBalanced
-        }`}
-      >
-        <Header />
-        <InformationWidgets />
+      <div className={homeLayout === 'widgets-right' ? classes.SidebarLayout : undefined}>
+        <div
+          className={`${classes.Overview} ${
+            homeLayout === 'stacked'
+              ? classes.OverviewStacked
+              : homeLayout === 'centered'
+                ? classes.OverviewCentered
+                : homeLayout === 'widgets-right'
+                  ? classes.OverviewWidgetsRight
+                  : classes.OverviewBalanced
+          }`}
+        >
+          <Header />
+          <InformationWidgets />
+        </div>
+
+        <div className={classes.HomeContent}>
+          {!isAuthenticated &&
+          !pinnedVisibleApps.length &&
+          !pinnedVisibleCategories.length ? (
+            <Message>
+              Welcome to Flame! Go to <Link to="/settings/app">/settings</Link>,
+              login and start customizing your new homepage
+            </Message>
+          ) : (
+            <></>
+          )}
+
+          {!config.hideApps && (isAuthenticated || pinnedVisibleApps.length) ? (
+            <Fragment>
+              <SectionHeadline title="Applications" link="/applications" />
+              {appsLoading ? (
+                <Spinner />
+              ) : (
+                <AppGrid
+                  apps={
+                    !appSearchResult
+                      ? pinnedVisibleApps
+                      : appSearchResult
+                  }
+                  totalApps={visibleApps.length}
+                  searching={!!localSearch}
+                />
+              )}
+              <div className={classes.HomeSpace}></div>
+            </Fragment>
+          ) : (
+            <></>
+          )}
+
+          {!config.hideCategories &&
+          (isAuthenticated || pinnedVisibleCategories.length) ? (
+            <Fragment>
+              <SectionHeadline title="Bookmarks" link="/bookmarks" />
+              {bookmarksLoading ? (
+                <Spinner />
+              ) : (
+                <BookmarkGrid
+                  categories={
+                    !bookmarkSearchResult
+                      ? pinnedVisibleCategories
+                      : bookmarkSearchResult
+                  }
+                  totalCategories={visibleCategories.length}
+                  searching={!!localSearch}
+                  fromHomepage={true}
+                />
+              )}
+            </Fragment>
+          ) : (
+            <></>
+          )}
+        </div>
       </div>
-
-      {!isAuthenticated &&
-      !pinnedVisibleApps.length &&
-      !pinnedVisibleCategories.length ? (
-        <Message>
-          Welcome to Flame! Go to <Link to="/settings/app">/settings</Link>,
-          login and start customizing your new homepage
-        </Message>
-      ) : (
-        <></>
-      )}
-
-      {!config.hideApps && (isAuthenticated || pinnedVisibleApps.length) ? (
-        <Fragment>
-          <SectionHeadline title="Applications" link="/applications" />
-          {appsLoading ? (
-            <Spinner />
-          ) : (
-            <AppGrid
-              apps={
-                !appSearchResult
-                  ? pinnedVisibleApps
-                  : appSearchResult
-              }
-              totalApps={visibleApps.length}
-              searching={!!localSearch}
-            />
-          )}
-          <div className={classes.HomeSpace}></div>
-        </Fragment>
-      ) : (
-        <></>
-      )}
-
-      {!config.hideCategories &&
-      (isAuthenticated || pinnedVisibleCategories.length) ? (
-        <Fragment>
-          <SectionHeadline title="Bookmarks" link="/bookmarks" />
-          {bookmarksLoading ? (
-            <Spinner />
-          ) : (
-            <BookmarkGrid
-              categories={
-                !bookmarkSearchResult
-                  ? pinnedVisibleCategories
-                  : bookmarkSearchResult
-              }
-              totalCategories={visibleCategories.length}
-              searching={!!localSearch}
-              fromHomepage={true}
-            />
-          )}
-        </Fragment>
-      ) : (
-        <></>
-      )}
 
       <Link to="/settings" className={classes.SettingsButton}>
         <Icon icon="mdiCog" color="var(--color-background)" />

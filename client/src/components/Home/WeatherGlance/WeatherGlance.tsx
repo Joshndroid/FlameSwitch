@@ -50,7 +50,8 @@ export const WeatherGlance = (): JSX.Element | null => {
       </div>}
     </div>
     {data.shortText && <p className={classes.Summary}>{data.shortText}</p>}
-    {!!data.forecast.length && <div className={classes.Forecast} aria-label="Daily forecast">
+    {!!data.forecast.length && <div className={classes.Forecast} aria-label="Daily forecast"
+      style={{ gridTemplateColumns: `repeat(${data.forecast.length}, minmax(0, 1fr))` }}>
       {data.forecast.map((day) => <div className={classes.Day} key={day.date}>
         <small>{new Date(`${day.date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'short' })}</small>
         <Icon icon={iconFor(day.condition)} />

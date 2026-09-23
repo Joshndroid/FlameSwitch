@@ -203,7 +203,7 @@ router.get('/config', auth, requireAuth, asyncWrapper(async (_req, res) => {
   res.json({ success: true, data: {
     url: settings?.url || '',
     entities: settings?.entities || {},
-    days: settings?.days || 3,
+    days: [3, 5, 7].includes(settings?.days) ? settings.days : 5,
     forecastMode: settings?.forecastMode || 'weather',
     forecastEntities: settings?.forecastEntities || [],
     bomForecastEntity: settings?.bomForecastEntity || '',
@@ -230,11 +230,11 @@ router.put('/config', auth, requireAuth, asyncWrapper(async (req, res) => {
   if (entities.forecast && !entities.forecast.startsWith('weather.')) {
     throw new ErrorResponse('Daily forecast must use a weather entity', 400);
   }
-  if (![3, 4, 5].includes(days)) {
-    throw new ErrorResponse('Choose 3, 4, or 5 forecast days', 400);
+  if (![3, 5, 7].includes(days)) {
+    throw new ErrorResponse('Choose 3, 5, or 7 forecast days', 400);
   }
   if (!['weather', 'entities', 'bom'].includes(forecastMode) ||
-    forecastEntities.length > 5 ||
+    forecastEntities.length > 7 ||
     forecastEntities.some((entity) => typeof entity !== 'string' ||
       (entity && !entityIdPattern.test(entity)))) {
     throw new ErrorResponse('Choose valid daily forecast entities', 400);
@@ -265,7 +265,7 @@ router.put('/config', auth, requireAuth, asyncWrapper(async (req, res) => {
     entities,
     days,
     forecastMode,
-    forecastEntities: [...forecastEntities, '', '', '', '', ''].slice(0, 5),
+    forecastEntities: [...forecastEntities, '', '', '', '', '', '', ''].slice(0, 7),
     bomForecastEntity,
     fuel: fuelSettings({ fuel }),
   };

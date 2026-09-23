@@ -9,11 +9,11 @@
 .Heading { display: flex; align-items: center; gap: 8px; }
 .Heading svg { width: 22px; height: 22px; }
 .Glance small { font-size: .64rem; font-weight: 700; letter-spacing: .11em; opacity: .65; }
-.Prices { display: flex; align-items: stretch; }
-.Price { position: relative; display: flex; flex-direction: column; min-width: 116px; padding: 0 16px; }
+.Prices { display: flex; align-items: stretch; max-width: 100%; overflow-x: auto; }
+.Price { position: relative; display: flex; flex: 1 1 0; flex-direction: column; min-width: 0; padding: 0 12px; }
 .Price:first-child { padding-left: 0; }
 .Price + .Price { border-left: 1px solid var(--color-accent); }
-.Swatch { position: absolute; top: 3px; right: 12px; width: 7px; height: 7px; border-radius: 50%; }
+.Swatch { position: absolute; top: 3px; right: 8px; width: 7px; height: 7px; border-radius: 50%; }
 .Price strong { font-size: 1.45rem; line-height: 1.15; white-space: nowrap; }
 .Price strong span { margin-left: 3px; font-size: .7rem; font-weight: 600; opacity: .65; }
 .Station { max-width: 150px; margin-top: 2px; font-size: .72rem; line-height: 1.25; opacity: .72; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -29,5 +29,5 @@
 
 @media (max-width: 600px) {
   .Prices { overflow-x: auto; max-width: 100%; }
-  .Price { min-width: 108px; padding: 0 12px; }
+  .Price { padding: 0 10px; }
 }
