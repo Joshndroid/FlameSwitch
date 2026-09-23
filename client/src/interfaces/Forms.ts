@@ -1,4 +1,4 @@
-import { ContentLayout, HomeLayout, WidgetOrder } from './Config';
+import { ContentLayout, HomeLayout, WidgetDensity, WidgetOrder } from './Config';
 
 export interface GeneralForm {
   defaultSearchProvider: string;
@@ -29,6 +29,7 @@ export interface UISettingsForm {
   showWeatherWidget: boolean;
   showFuelWidget: boolean;
   widgetOrder: WidgetOrder;
+  widgetDensity: WidgetDensity;
 }
 
 export interface DockerSettingsForm {

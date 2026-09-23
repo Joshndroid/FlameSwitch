@@ -70,6 +70,24 @@
   background: var(--color-accent);
 }
 
+.WidgetPreview {
+  margin: 0 0 24px;
+  padding: 16px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-primary) 4%, transparent);
+  overflow: hidden;
+}
+
+.WidgetPreview > strong {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--color-primary);
+}
+
+.WidgetPreview > div {
+  justify-content: flex-start;
+}
+
 .balanced {
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 2fr 1fr;

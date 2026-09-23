@@ -11,6 +11,7 @@ import { UISettingsForm } from '../../../interfaces';
 
 // UI
 import { InputGroup, Button, SettingsHeadline } from '../../UI';
+import { InformationWidgets } from '../../Home/InformationWidgets/InformationWidgets';
 
 // Utils
 import { uiSettingsTemplate, inputHandler } from '../../../utility';
@@ -55,6 +56,7 @@ export const UISettings = (): JSX.Element => {
       showWeatherWidget: config.showWeatherWidget !== false,
       showFuelWidget: config.showFuelWidget !== false,
       widgetOrder: config.widgetOrder || 'weather-first',
+      widgetDensity: config.widgetDensity || 'comfortable',
     });
   }, [loading]);
 
@@ -228,6 +230,24 @@ export const UISettings = (): JSX.Element => {
           <option value="fuel-first">Fuel, then weather</option>
         </select>
       </InputGroup>
+      <InputGroup>
+        <label htmlFor="widgetDensity">Widget density</label>
+        <select id="widgetDensity" name="widgetDensity" value={formData.widgetDensity}
+          onChange={(e) => inputChangeHandler(e)}>
+          <option value="comfortable">Comfortable</option>
+          <option value="compact">Compact</option>
+        </select>
+        <span>Compact reduces spacing and forecast sizing without hiding information.</span>
+      </InputGroup>
+      <div className={classes.WidgetPreview}>
+        <strong>Widget preview</strong>
+        <InformationWidgets preferences={{
+          showWeatherWidget: formData.showWeatherWidget,
+          showFuelWidget: formData.showFuelWidget,
+          widgetOrder: formData.widgetOrder,
+          widgetDensity: formData.widgetDensity,
+        }} />
+      </div>
 
       {/* DATE FORMAT */}
       <InputGroup>

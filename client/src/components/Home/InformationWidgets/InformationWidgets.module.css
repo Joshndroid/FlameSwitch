@@ -21,6 +21,8 @@
 
 .Widgets > div:empty { display: none; }
 
+.Compact { gap: 1.25rem; }
+
 @media (max-width: 1000px) {
   .Widgets { justify-content: flex-start; gap: 1.5rem; width: 100%; }
 }

@@ -117,6 +117,13 @@ const historyPoints = (history, entityId) => {
   })).filter((point) => point.value !== null && point.time);
 };
 
+const fuelPriceChange = (points, currentPrice) => {
+  if (currentPrice === null) return null;
+  const previous = [...points].reverse()
+    .find(({ value }) => value !== currentPrice);
+  return previous ? currentPrice - previous.value : null;
+};
+
 const futureDate = (index, now = new Date()) => {
   const date = new Date(now);
   date.setDate(date.getDate() + index + 1);
@@ -360,6 +367,9 @@ router.get('/glance', asyncWrapper(async (_req, res) => {
     cache = { key, expires: Date.now() + glanceCacheDuration, data };
     res.json({ success: true, data });
   } catch {
+    if (cache.key === key && cache.data) {
+      return res.json({ success: true, data: { ...cache.data, stale: true } });
+    }
     throw new ErrorResponse('Home Assistant weather is unavailable', 502);
   }
 }));
@@ -381,38 +391,42 @@ router.get('/fuel-glance', asyncWrapper(async (_req, res) => {
     const states = await haRequest(settings, 'states');
     const byId = Object.fromEntries(states.map((state) => [state.entity_id, state]));
     let history = [];
-    if (fuel.showGraph) {
-      const now = new Date();
-      const start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const entityIds = configuredSources.map(({ priceEntity }) => priceEntity).join(',');
-      const path = `history/period/${encodeURIComponent(start.toISOString())}` +
-        `?filter_entity_id=${encodeURIComponent(entityIds)}` +
-        `&end_time=${encodeURIComponent(now.toISOString())}&minimal_response&no_attributes`;
-      try {
-        history = await haRequest(settings, path);
-      } catch {
-        // Recorder history is optional; current fuel prices remain useful without it.
-      }
+    const now = new Date();
+    const start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const entityIds = configuredSources.map(({ priceEntity }) => priceEntity).join(',');
+    const path = `history/period/${encodeURIComponent(start.toISOString())}` +
+      `?filter_entity_id=${encodeURIComponent(entityIds)}` +
+      `&end_time=${encodeURIComponent(now.toISOString())}&minimal_response&no_attributes`;
+    try {
+      history = await haRequest(settings, path);
+    } catch {
+      // Recorder history is optional; current fuel prices remain useful without it.
     }
 
     const sources = configuredSources.map((source) => {
       const price = byId[source.priceEntity];
       const station = byId[source.stationEntity];
       const attributes = price?.attributes || {};
+      const currentPrice = numericValue(price?.state);
+      const points = historyPoints(history, source.priceEntity);
       return {
         name: source.name,
-        price: numericValue(price?.state),
+        price: currentPrice,
         unit: String(attributes.unit_of_measurement || 'c/L'),
         station: station && !['unknown', 'unavailable'].includes(station.state)
           ? String(station.state)
           : String(attributes.station_name || attributes.station || ''),
-        history: fuel.showGraph ? historyPoints(history, source.priceEntity) : [],
+        change: fuelPriceChange(points, currentPrice),
+        history: fuel.showGraph ? points : [],
       };
     }).filter(({ price }) => price !== null);
     const data = sources.length ? { showGraph: fuel.showGraph, sources } : null;
     fuelCache = { key, expires: Date.now() + glanceCacheDuration, data };
     res.json({ success: true, data });
   } catch {
+    if (fuelCache.key === key && fuelCache.data) {
+      return res.json({ success: true, data: { ...fuelCache.data, stale: true } });
+    }
     throw new ErrorResponse('Home Assistant fuel prices are unavailable', 502);
   }
 }));
@@ -422,3 +436,4 @@ module.exports.isLocalUrl = isLocalUrl;
 module.exports.forecastEntityDay = forecastEntityDay;
 module.exports.bomForecastDay = bomForecastDay;
 module.exports.historyPoints = historyPoints;
+module.exports.fuelPriceChange = fuelPriceChange;

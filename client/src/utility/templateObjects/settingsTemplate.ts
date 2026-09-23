@@ -24,6 +24,7 @@ export const uiSettingsTemplate: UISettingsForm = {
   showWeatherWidget: true,
   showFuelWidget: true,
   widgetOrder: 'weather-first',
+  widgetDensity: 'comfortable',
 };
 
 export const generalSettingsTemplate: GeneralForm = {

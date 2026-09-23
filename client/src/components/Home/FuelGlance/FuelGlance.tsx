@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { WidgetDensity } from '../../../interfaces';
+import { loadWidgetCache, saveWidgetCache } from '../../../utility/widgetCache';
 import { Icon } from '../../UI';
 import classes from './FuelGlance.module.css';
 
@@ -9,9 +11,11 @@ type FuelSource = {
   price: number;
   unit: string;
   station: string;
+  change: number | null;
   history: HistoryPoint[];
 };
-type FuelData = { showGraph: boolean; sources: FuelSource[] };
+type FuelData = { showGraph: boolean; sources: FuelSource[]; stale?: boolean };
+type Props = { density?: WidgetDensity };
 
 const graphSize = { width: 360, height: 72, inset: 4 };
 
@@ -20,17 +24,25 @@ const priceText = (price: number) => price.toLocaleString(undefined, {
   maximumFractionDigits: 1,
 });
 
-export const FuelGlance = (): JSX.Element | null => {
+export const FuelGlance = ({ density = 'comfortable' }: Props): JSX.Element | null => {
   const [data, setData] = useState<FuelData | null>(null);
   const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
     let active = true;
     axios.get('/api/home-assistant/fuel-glance')
-      .then(({ data }) => {
-        if (active) { setData(data.data); setUnavailable(false); }
+      .then(({ data: response }) => {
+        if (response.data && !response.data.stale) {
+          saveWidgetCache('fuel', response.data);
+        }
+        if (active) { setData(response.data); setUnavailable(false); }
       })
-      .catch(() => { if (active) { setData(null); setUnavailable(true); } });
+      .catch(() => {
+        if (!active) return;
+        const cached = loadWidgetCache<FuelData>('fuel');
+        setData(cached ? { ...cached, stale: true } : null);
+        setUnavailable(!cached);
+      });
     return () => { active = false; };
   }, []);
 
@@ -61,16 +73,23 @@ export const FuelGlance = (): JSX.Element | null => {
     ? <div className={classes.Unavailable} role="status">Fuel prices unavailable</div>
     : null;
 
-  return <section className={classes.Glance} aria-label="Fuel prices">
+  return <section className={`${classes.Glance} ${density === 'compact' ? classes.Compact : ''}`}
+    aria-label="Fuel prices">
     <div className={classes.Heading}>
       <Icon icon="mdiGasStation" color="var(--color-accent)" />
       <small>FUEL GLANCE</small>
+      {data.stale && <small className={classes.Status}>CACHED</small>}
     </div>
     <div className={classes.Prices}>
       {data.sources.map((source, index) => <div className={classes.Price} key={`${source.name}-${index}`}>
         <span className={`${classes.Swatch} ${classes[`Series${index}`]}`} aria-hidden="true"></span>
         <small>{source.name.toUpperCase()}</small>
         <strong>{priceText(source.price)}<span>{source.unit}</span></strong>
+        {source.change != null && source.change !== 0 && <span
+          className={`${classes.Trend} ${source.change > 0 ? classes.TrendUp : classes.TrendDown}`}
+          aria-label={`${source.change > 0 ? 'Up' : 'Down'} ${priceText(Math.abs(source.change))} ${source.unit}`}>
+          {source.change > 0 ? '↑' : '↓'} {priceText(Math.abs(source.change))}
+        </span>}
         {source.station && <span className={classes.Station}>{source.station}</span>}
       </div>)}
     </div>

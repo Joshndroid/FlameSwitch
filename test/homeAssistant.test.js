@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  isLocalUrl, forecastEntityDay, bomForecastDay, historyPoints,
+  isLocalUrl, forecastEntityDay, bomForecastDay, historyPoints, fuelPriceChange,
 } = require('../routes/homeAssistant');
 
 test('Home Assistant address must be a local IP without redirects or URL extras', () => {
@@ -98,4 +98,15 @@ test('fuel history keeps numeric readings for the selected entity', () => {
     { value: 179.9, time: '2026-09-22T00:00:00Z' },
     { value: 181.5, time: '2026-09-23T00:00:00Z' },
   ]);
+});
+
+test('fuel trend compares the current price with the last different reading', () => {
+  const points = [
+    { value: 175.9, time: '2026-09-21T00:00:00Z' },
+    { value: 181.5, time: '2026-09-22T00:00:00Z' },
+    { value: 181.5, time: '2026-09-23T00:00:00Z' },
+  ];
+
+  assert.ok(Math.abs(fuelPriceChange(points, 181.5) - 5.6) < 0.0001);
+  assert.equal(fuelPriceChange([], 181.5), null);
 });

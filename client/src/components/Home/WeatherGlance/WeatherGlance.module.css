@@ -7,6 +7,7 @@
   padding: 0;
 }
 
+.Status { justify-self: end; margin-bottom: 4px; }
 .Current { display: flex; align-items: center; gap: 14px; }
 .Mark { width: 40px; height: 40px; color: var(--color-accent); flex: none; }
 .Outside { display: flex; flex-direction: column; min-width: 100px; }
@@ -24,6 +25,18 @@
 .Day b { font-size: .95rem; }
 .Day span { font-size: .75rem; opacity: .65; }
 .Day small:last-child { font-size: .55rem; letter-spacing: .04em; }
+.Compact .Current { gap: 10px; }
+.Compact .Mark { width: 32px; height: 32px; }
+.Compact .Outside { min-width: 88px; }
+.Compact .Outside strong { font-size: 1.4rem; }
+.Compact .Details { gap: 10px; padding-left: 10px; }
+.Compact .Details b { font-size: .88rem; }
+.Compact .Summary { font-size: .75rem; margin-top: 7px; }
+.Compact .Forecast { gap: 3px; margin-top: 8px; padding-top: 8px; }
+.Compact .Day svg { width: 18px; height: 18px; }
+.Compact .Day b { font-size: .82rem; }
+.Compact .Day span { font-size: .66rem; }
+.Compact .Day small:last-child { font-size: .5rem; }
 .Unavailable { color: var(--color-primary); opacity: .6; font-size: .8rem; }
 @media (max-width: 600px) {
   .Current { flex-wrap: wrap; gap: 12px; }

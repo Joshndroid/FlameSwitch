@@ -33,6 +33,7 @@ export const configTemplate: Config = {
   showWeatherWidget: true,
   showFuelWidget: true,
   widgetOrder: 'weather-first',
+  widgetDensity: 'comfortable',
   automaticUpdates: true,
   useDefaults: true,
   updateUrl: '',

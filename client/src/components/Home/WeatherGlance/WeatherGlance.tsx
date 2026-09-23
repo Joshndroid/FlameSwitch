@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { WidgetDensity } from '../../../interfaces';
+import { loadWidgetCache, saveWidgetCache } from '../../../utility/widgetCache';
 import { Icon } from '../../UI';
 import classes from './WeatherGlance.module.css';
 
 type Reading = { value: string; unit: string; condition: string | null } | null;
 type Day = { date: string; condition: string; high: number | null; low: number | null; unit: string; rainChance: number | null };
-type Glance = { inside: Reading; outside: Reading; rain: Reading; shortText: string | null; forecast: Day[] };
+type Glance = { inside: Reading; outside: Reading; rain: Reading; shortText: string | null; forecast: Day[]; stale?: boolean };
+type Props = { density?: WidgetDensity };
 
 const iconFor = (condition?: string | null) => {
   if (!condition) return 'mdiWeatherPartlyCloudy';
@@ -18,17 +21,25 @@ const iconFor = (condition?: string | null) => {
   return 'mdiWeatherPartlyCloudy';
 };
 
-export const WeatherGlance = (): JSX.Element | null => {
+export const WeatherGlance = ({ density = 'comfortable' }: Props): JSX.Element | null => {
   const [data, setData] = useState<Glance | null>(null);
   const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
     let active = true;
     axios.get('/api/home-assistant/glance')
-      .then(({ data }) => {
-        if (active) { setData(data.data); setUnavailable(false); }
+      .then(({ data: response }) => {
+        if (response.data && !response.data.stale) {
+          saveWidgetCache('weather', response.data);
+        }
+        if (active) { setData(response.data); setUnavailable(false); }
       })
-      .catch(() => { if (active) { setData(null); setUnavailable(true); } });
+      .catch(() => {
+        if (!active) return;
+        const cached = loadWidgetCache<Glance>('weather');
+        setData(cached ? { ...cached, stale: true } : null);
+        setUnavailable(!cached);
+      });
     return () => { active = false; };
   }, []);
 
@@ -36,7 +47,9 @@ export const WeatherGlance = (): JSX.Element | null => {
   if (!data) return <div className={classes.Unavailable} role="status">Weather unavailable</div>;
   if (!data.inside && !data.outside && !data.rain && !data.shortText && !data.forecast.length) return null;
 
-  return <section className={classes.Card} aria-label="Local weather">
+  return <section className={`${classes.Card} ${density === 'compact' ? classes.Compact : ''}`}
+    aria-label="Local weather">
+    {data.stale && <small className={classes.Status}>CACHED</small>}
     <div className={classes.Current}>
       <div className={classes.Mark}><Icon icon={iconFor(data.outside?.condition || data.forecast[0]?.condition)} color="var(--color-accent)" /></div>
       {data.outside ? <div className={classes.Outside}>
