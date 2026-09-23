@@ -6,6 +6,8 @@ import { Category } from '../../../interfaces';
 
 import { BookmarkCard } from '../BookmarkCard/BookmarkCard';
 import { Message } from '../../UI';
+import { useSelector } from 'react-redux';
+import { State } from '../../../store/reducers';
 
 interface Props {
   categories: Category[];
@@ -15,6 +17,9 @@ interface Props {
 }
 
 export const BookmarkGrid = (props: Props): JSX.Element => {
+  const contentLayout = useSelector(
+    (state: State) => state.config.config.contentLayout || 'balanced'
+  );
   const {
     categories,
     totalCategories,
@@ -29,7 +34,7 @@ export const BookmarkGrid = (props: Props): JSX.Element => {
       bookmarks = <Message>No bookmarks match your search criteria</Message>;
     } else {
       bookmarks = (
-        <div className={classes.BookmarkGrid}>
+        <div className={`${classes.BookmarkGrid} ${classes[contentLayout]}`}>
           {categories.map(
             (category: Category): JSX.Element => (
               <BookmarkCard

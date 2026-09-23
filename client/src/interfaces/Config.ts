@@ -1,4 +1,5 @@
 export type HomeLayout = 'balanced' | 'stacked' | 'centered';
+export type ContentLayout = 'relaxed' | 'balanced' | 'compact';
 
 export interface Config {
   customTitle: string;
@@ -28,6 +29,7 @@ export interface Config {
   isKilometer: boolean;
   hideDate: boolean;
   homeLayout: HomeLayout;
+  contentLayout: ContentLayout;
   automaticUpdates?: boolean;
   useDefaults?: boolean;
   updateUrl?: string;

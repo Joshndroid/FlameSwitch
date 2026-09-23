@@ -20,6 +20,7 @@ export const uiSettingsTemplate: UISettingsForm = {
   hideSearch: false,
   disableAutofocus: false,
   homeLayout: 'balanced',
+  contentLayout: 'balanced',
 };
 
 export const generalSettingsTemplate: GeneralForm = {

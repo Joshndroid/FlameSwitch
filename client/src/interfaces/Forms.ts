@@ -1,3 +1,5 @@
+import { ContentLayout, HomeLayout } from './Config';
+
 export interface GeneralForm {
   defaultSearchProvider: string;
   secondarySearchProvider: string;
@@ -23,6 +25,7 @@ export interface UISettingsForm {
   hideSearch: boolean;
   disableAutofocus: boolean;
   homeLayout: HomeLayout;
+  contentLayout: ContentLayout;
 }
 
 export interface DockerSettingsForm {
@@ -42,4 +45,3 @@ export interface AppDetailsForm {
   updateUrl: string;
   showPopups: boolean;
 }
-import { HomeLayout } from './Config';

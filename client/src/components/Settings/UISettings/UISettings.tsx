@@ -16,7 +16,7 @@ import { InputGroup, Button, SettingsHeadline } from '../../UI';
 import { uiSettingsTemplate, inputHandler } from '../../../utility';
 import classes from './UISettings.module.css';
 
-const layouts = [
+const headerLayouts = [
   {
     value: 'balanced',
     name: 'Balanced',
@@ -24,6 +24,12 @@ const layouts = [
   },
   { value: 'stacked', name: 'Stacked', detail: 'Weather below the greeting' },
   { value: 'centered', name: 'Centered', detail: 'A centered compact header' },
+] as const;
+
+const contentLayouts = [
+  { value: 'relaxed', name: 'Relaxed', detail: 'Fewer, wider columns' },
+  { value: 'balanced', name: 'Balanced', detail: 'Adapts to most screens' },
+  { value: 'compact', name: 'Compact', detail: 'More items across each row' },
 ] as const;
 
 export const UISettings = (): JSX.Element => {
@@ -40,6 +46,7 @@ export const UISettings = (): JSX.Element => {
     setFormData({
       ...config,
       homeLayout: config.homeLayout || 'balanced',
+      contentLayout: config.contentLayout || 'balanced',
     });
   }, [loading]);
 
@@ -119,7 +126,7 @@ export const UISettings = (): JSX.Element => {
       <fieldset className={classes.LayoutField}>
         <legend>Homepage layout</legend>
         <div className={classes.LayoutChoices}>
-          {layouts.map((layout) => (
+          {headerLayouts.map((layout) => (
             <label className={classes.LayoutOption} key={layout.value}>
               <input
                 type="radio"
@@ -247,6 +254,32 @@ export const UISettings = (): JSX.Element => {
 
       {/* === SECTIONS OPTIONS === */}
       <SettingsHeadline text="Sections" />
+      <fieldset className={classes.LayoutField}>
+        <legend>Application and bookmark density</legend>
+        <div className={classes.LayoutChoices}>
+          {contentLayouts.map((layout) => (
+            <label className={classes.LayoutOption} key={layout.value}>
+              <input
+                type="radio"
+                name="contentLayout"
+                value={layout.value}
+                checked={formData.contentLayout === layout.value}
+                onChange={(e) => inputChangeHandler(e)}
+              />
+              <span
+                className={`${classes.LayoutPreview} ${classes[`content${layout.name}`]}`}
+                aria-hidden="true"
+              >
+                {Array.from({ length: 8 }, (_, index) => (
+                  <i key={index}></i>
+                ))}
+              </span>
+              <strong>{layout.name}</strong>
+              <small>{layout.detail}</small>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       {/* HIDE APPS */}
       <InputGroup>
         <label htmlFor="hideApps">Hide applications</label>

@@ -111,6 +111,21 @@
   grid-column: 1 / 4;
 }
 
+.contentRelaxed {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.contentBalanced {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.contentCompact {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
 @media (max-width: 700px) {
   .LayoutChoices {
     grid-template-columns: 1fr;

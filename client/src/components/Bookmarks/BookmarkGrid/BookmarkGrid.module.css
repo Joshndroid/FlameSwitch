@@ -1,22 +1,16 @@
 .BookmarkGrid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  column-gap: clamp(18px, 2.5vw, 44px);
 }
 
-@media (min-width: 430px) {
-  .BookmarkGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.relaxed {
+  grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
 }
 
-@media (min-width: 670px) {
-  .BookmarkGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.balanced {
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
 }
 
-@media (min-width: 900px) {
-  .BookmarkGrid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.compact {
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
 }

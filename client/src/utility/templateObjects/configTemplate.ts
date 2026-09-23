@@ -29,6 +29,7 @@ export const configTemplate: Config = {
   isKilometer: true,
   hideDate: false,
   homeLayout: 'balanced',
+  contentLayout: 'balanced',
   automaticUpdates: true,
   useDefaults: true,
   updateUrl: '',

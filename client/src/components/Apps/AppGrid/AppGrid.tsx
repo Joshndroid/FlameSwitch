@@ -4,6 +4,8 @@ import { App } from '../../../interfaces/App';
 
 import { AppCard } from '../AppCard/AppCard';
 import { Message } from '../../UI';
+import { useSelector } from 'react-redux';
+import { State } from '../../../store/reducers';
 
 interface Props {
   apps: App[];
@@ -12,6 +14,9 @@ interface Props {
 }
 
 export const AppGrid = (props: Props): JSX.Element => {
+  const contentLayout = useSelector(
+    (state: State) => state.config.config.contentLayout || 'balanced'
+  );
   let apps: JSX.Element;
 
   if (props.searching || props.apps.length) {
@@ -19,7 +24,7 @@ export const AppGrid = (props: Props): JSX.Element => {
       apps = <Message>No apps match your search criteria</Message>;
     } else {
       apps = (
-        <div className={classes.AppGrid}>
+        <div className={`${classes.AppGrid} ${classes[contentLayout]}`}>
           {props.apps.map((app: App): JSX.Element => {
             return <AppCard key={app.id} app={app} />;
           })}

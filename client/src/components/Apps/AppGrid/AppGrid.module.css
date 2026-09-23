@@ -1,22 +1,16 @@
 .AppGrid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  column-gap: clamp(16px, 2vw, 36px);
 }
 
-@media (min-width: 430px) {
-  .AppGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.relaxed {
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
 }
 
-@media (min-width: 670px) {
-  .AppGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.balanced {
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
 }
 
-@media (min-width: 900px) {
-  .AppGrid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.compact {
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
 }
