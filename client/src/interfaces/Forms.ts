@@ -22,6 +22,7 @@ export interface UISettingsForm {
   hideDate: boolean;
   hideSearch: boolean;
   disableAutofocus: boolean;
+  homeLayout: HomeLayout;
 }
 
 export interface DockerSettingsForm {
@@ -41,3 +42,4 @@ export interface AppDetailsForm {
   updateUrl: string;
   showPopups: boolean;
 }
+import { HomeLayout } from './Config';

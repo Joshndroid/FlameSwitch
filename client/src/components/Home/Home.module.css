@@ -1,21 +1,44 @@
 .Overview {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
+  display: grid;
   margin-bottom: 2rem;
 }
 
+.OverviewBalanced {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+}
+
+.OverviewBalanced > section,
+.OverviewBalanced > div:last-child {
+  justify-self: end;
+}
+
+.OverviewStacked {
+  justify-items: start;
+  gap: 1rem;
+}
+
+.OverviewCentered {
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
 .Overview > header {
-  flex: 1 1 auto;
   min-width: 0;
 }
 
 @media (max-width: 760px) {
-  .Overview {
-    align-items: stretch;
-    flex-direction: column;
+  .OverviewBalanced {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
     gap: 1rem;
+  }
+
+  .OverviewBalanced > section,
+  .OverviewBalanced > div:last-child {
+    justify-self: start;
   }
 }
 

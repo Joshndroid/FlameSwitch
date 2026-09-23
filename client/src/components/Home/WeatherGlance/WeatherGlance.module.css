@@ -3,13 +3,8 @@
   width: fit-content;
   max-width: 100%;
   color: var(--color-primary);
-  border: 1px solid var(--color-accent);
-  border-radius: 12px;
-  background-color: var(--color-background);
-  background: linear-gradient(120deg, color-mix(in srgb, var(--color-accent) 13%, var(--color-background)), var(--color-background));
   margin: 0;
-  padding: 14px 18px;
-  box-shadow: 0 8px 28px color-mix(in srgb, var(--color-primary) 7%, transparent);
+  padding: 0;
 }
 
 .Current { display: flex; align-items: center; gap: 14px; }
@@ -30,7 +25,6 @@
 .Day span { grid-column: 2; font-size: .75rem; opacity: .65; }
 .Unavailable { color: var(--color-primary); opacity: .6; font-size: .8rem; }
 @media (max-width: 600px) {
-  .Card { padding: 14px; }
   .Current { flex-wrap: wrap; gap: 12px; }
   .Details { width: 100%; margin: 6px 0 0; padding: 12px 0 0; border-left: 0; border-top: 1px solid var(--color-accent); }
 }

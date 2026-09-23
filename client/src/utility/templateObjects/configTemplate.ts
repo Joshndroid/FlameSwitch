@@ -28,6 +28,7 @@ export const configTemplate: Config = {
   defaultTheme: 'tron',
   isKilometer: true,
   hideDate: false,
+  homeLayout: 'balanced',
   automaticUpdates: true,
   useDefaults: true,
   updateUrl: '',

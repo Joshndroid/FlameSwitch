@@ -33,6 +33,7 @@ export const Home = (): JSX.Element => {
     config: { config },
     auth: { isAuthenticated },
   } = useSelector((state: State) => state);
+  const homeLayout = config.homeLayout || 'balanced';
 
   const dispatch = useDispatch();
   const { getApps, getCategories } = bindActionCreators(
@@ -139,7 +140,15 @@ export const Home = (): JSX.Element => {
         <div></div>
       )}
 
-      <div className={classes.Overview}>
+      <div
+        className={`${classes.Overview} ${
+          homeLayout === 'stacked'
+            ? classes.OverviewStacked
+            : homeLayout === 'centered'
+              ? classes.OverviewCentered
+              : classes.OverviewBalanced
+        }`}
+      >
         <Header />
         <WeatherGlance />
       </div>

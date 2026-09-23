@@ -1,3 +1,5 @@
+export type HomeLayout = 'balanced' | 'stacked' | 'centered';
+
 export interface Config {
   customTitle: string;
   pinAppsByDefault: boolean;
@@ -25,6 +27,7 @@ export interface Config {
   defaultTheme: string;
   isKilometer: boolean;
   hideDate: boolean;
+  homeLayout: HomeLayout;
   automaticUpdates?: boolean;
   useDefaults?: boolean;
   updateUrl?: string;

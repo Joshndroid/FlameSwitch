@@ -14,6 +14,17 @@ import { InputGroup, Button, SettingsHeadline } from '../../UI';
 
 // Utils
 import { uiSettingsTemplate, inputHandler } from '../../../utility';
+import classes from './UISettings.module.css';
+
+const layouts = [
+  {
+    value: 'balanced',
+    name: 'Balanced',
+    detail: 'Weather beside the greeting',
+  },
+  { value: 'stacked', name: 'Stacked', detail: 'Weather below the greeting' },
+  { value: 'centered', name: 'Centered', detail: 'A centered compact header' },
+] as const;
 
 export const UISettings = (): JSX.Element => {
   const { loading, config } = useSelector((state: State) => state.config);
@@ -28,6 +39,7 @@ export const UISettings = (): JSX.Element => {
   useEffect(() => {
     setFormData({
       ...config,
+      homeLayout: config.homeLayout || 'balanced',
     });
   }, [loading]);
 
@@ -104,6 +116,32 @@ export const UISettings = (): JSX.Element => {
 
       {/* === HEADER OPTIONS === */}
       <SettingsHeadline text="Header" />
+      <fieldset className={classes.LayoutField}>
+        <legend>Homepage layout</legend>
+        <div className={classes.LayoutChoices}>
+          {layouts.map((layout) => (
+            <label className={classes.LayoutOption} key={layout.value}>
+              <input
+                type="radio"
+                name="homeLayout"
+                value={layout.value}
+                checked={formData.homeLayout === layout.value}
+                onChange={(e) => inputChangeHandler(e)}
+              />
+              <span
+                className={`${classes.LayoutPreview} ${classes[layout.value]}`}
+                aria-hidden="true"
+              >
+                <i></i>
+                <i></i>
+                <i></i>
+              </span>
+              <strong>{layout.name}</strong>
+              <small>{layout.detail}</small>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       {/* HIDE HEADER */}
       <InputGroup>
         <label htmlFor="hideHeader">

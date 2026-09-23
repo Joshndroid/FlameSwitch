@@ -19,6 +19,7 @@ export const uiSettingsTemplate: UISettingsForm = {
   hideDate: false,
   hideSearch: false,
   disableAutofocus: false,
+  homeLayout: 'balanced',
 };
 
 export const generalSettingsTemplate: GeneralForm = {
