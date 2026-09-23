@@ -9,7 +9,7 @@ import { State } from '../../../store/reducers';
 import classes from './Header.module.css';
 
 // Utils
-import { getDateTime } from './functions/getDateTime';
+import { getDate, getTime } from './functions/getDateTime';
 import { greeter } from './functions/greeter';
 
 export const Header = (): JSX.Element => {
@@ -17,28 +17,31 @@ export const Header = (): JSX.Element => {
     (state: State) => state.config.config
   );
 
-  const [dateTime, setDateTime] = useState<string>(getDateTime());
+  const [date, setDate] = useState<string>(getDate());
+  const [time, setTime] = useState<string>(getTime());
   const [greeting, setGreeting] = useState<string>(greeter());
 
   useEffect(() => {
-    let dateTimeInterval: NodeJS.Timeout;
+    let clockInterval: NodeJS.Timeout;
 
-    dateTimeInterval = setInterval(() => {
-      setDateTime(getDateTime());
+    clockInterval = setInterval(() => {
+      setDate(getDate());
+      setTime(getTime());
       setGreeting(greeter());
     }, 1000);
 
-    return () => window.clearInterval(dateTimeInterval);
+    return () => window.clearInterval(clockInterval);
   }, []);
 
   return (
     <header className={classes.Header}>
-      {(!hideDate || showTime) && <p>{dateTime}</p>}
+      {!hideDate && <p>{date}</p>}
       {!hideHeader && (
         <div className={classes.HeaderMain}>
           <h1>{greeting}</h1>
         </div>
       )}
+      {showTime && <p className={classes.Time}>{time}</p>}
 
       <Link to="/settings" className={classes.SettingsLink}>
         Go to Settings

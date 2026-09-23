@@ -179,17 +179,17 @@ export const UISettings = (): JSX.Element => {
         </select>
       </InputGroup>
 
-      {/* HIDE TIME */}
+      {/* SHOW TIME */}
       <InputGroup>
-        <label htmlFor="showTime">Hide time</label>
+        <label htmlFor="showTime">Show time beneath greeting</label>
         <select
           id="showTime"
           name="showTime"
           value={formData.showTime ? 1 : 0}
           onChange={(e) => inputChangeHandler(e, { isBool: true })}
         >
-          <option value={0}>True</option>
-          <option value={1}>False</option>
+          <option value={1}>True</option>
+          <option value={0}>False</option>
         </select>
       </InputGroup>
 

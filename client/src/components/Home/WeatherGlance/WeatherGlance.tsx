@@ -24,14 +24,12 @@ export const WeatherGlance = (): JSX.Element | null => {
 
   useEffect(() => {
     let active = true;
-    const refresh = () => axios.get('/api/home-assistant/glance')
+    axios.get('/api/home-assistant/glance')
       .then(({ data }) => {
         if (active) { setData(data.data); setUnavailable(false); }
       })
       .catch(() => { if (active) { setData(null); setUnavailable(true); } });
-    refresh();
-    const timer = window.setInterval(refresh, 60000);
-    return () => { active = false; window.clearInterval(timer); };
+    return () => { active = false; };
   }, []);
 
   if (!data && !unavailable) return null;
@@ -53,8 +51,8 @@ export const WeatherGlance = (): JSX.Element | null => {
     </div>
     {data.shortText && <p className={classes.Summary}>{data.shortText}</p>}
     {!!data.forecast.length && <div className={classes.Forecast} aria-label="Daily forecast">
-      {data.forecast.map((day, index) => <div className={classes.Day} key={day.date}>
-        <small>T+{index + 1} · {new Date(`${day.date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'short' })}</small>
+      {data.forecast.map((day) => <div className={classes.Day} key={day.date}>
+        <small>{new Date(`${day.date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'short' })}</small>
         <Icon icon={iconFor(day.condition)} />
         <b>{day.high == null ? '—' : `${day.high}${day.unit}`}</b>
         <span>{day.low == null ? '—' : `${day.low}${day.unit}`}</span>

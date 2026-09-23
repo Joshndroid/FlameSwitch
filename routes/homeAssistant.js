@@ -11,6 +11,7 @@ const router = express.Router();
 const file = join(__dirname, '../data/home-assistant.json');
 const fields = ['inside', 'outside', 'rain', 'shortText', 'forecast'];
 const entityIdPattern = /^(sensor|weather)\.[a-z0-9_]+$/;
+const glanceCacheDuration = 5 * 60 * 1000;
 let cache = { key: '', expires: 0, data: null };
 
 const readSettings = async () => {
@@ -309,7 +310,7 @@ router.get('/glance', asyncWrapper(async (_req, res) => {
         // A weather entity without daily forecasts should not hide current readings.
       }
     }
-    cache = { key, expires: Date.now() + 60000, data };
+    cache = { key, expires: Date.now() + glanceCacheDuration, data };
     res.json({ success: true, data });
   } catch {
     throw new ErrorResponse('Home Assistant weather is unavailable', 502);
