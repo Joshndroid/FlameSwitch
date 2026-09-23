@@ -4,16 +4,22 @@ import { applyAuth } from '../../../utility';
 import { Button, InputGroup, SettingsHeadline } from '../../UI';
 
 type EntityKey = 'inside' | 'outside' | 'rain' | 'shortText' | 'forecast';
+type ForecastMode = 'weather' | 'entities' | 'bom';
 type Settings = {
   url: string;
   tokenConfigured: boolean;
   days: number;
+  forecastMode: ForecastMode;
+  forecastEntities: string[];
+  bomForecastEntity: string;
   entities: Record<EntityKey, string>;
 };
 type Entity = { id: string; name: string; unit: string };
 
 const empty: Settings = {
-  url: '', tokenConfigured: false, days: 3,
+  url: '', tokenConfigured: false, days: 3, forecastMode: 'weather',
+  forecastEntities: ['', '', '', '', ''],
+  bomForecastEntity: '',
   entities: { inside: '', outside: '', rain: '', shortText: '', forecast: '' },
 };
 const fields: { key: EntityKey; label: string; hint: string }[] = [
@@ -21,7 +27,6 @@ const fields: { key: EntityKey; label: string; hint: string }[] = [
   { key: 'inside', label: 'Inside now', hint: 'Indoor temperature sensor' },
   { key: 'rain', label: 'Rain in the last 24 hours', hint: '24 hour rain accumulation sensor' },
   { key: 'shortText', label: 'Short description', hint: 'For example, BOM short_text sensor' },
-  { key: 'forecast', label: 'Daily forecast', hint: 'Weather entity supporting daily forecasts' },
 ];
 
 export const HomeAssistantSettings = (): JSX.Element => {
@@ -45,7 +50,9 @@ export const HomeAssistantSettings = (): JSX.Element => {
     axios.get('/api/home-assistant/config', { headers: applyAuth() })
       .then(({ data }) => {
         setSettings({ ...empty, ...data.data,
-          entities: { ...empty.entities, ...data.data.entities } });
+          entities: { ...empty.entities, ...data.data.entities },
+          forecastEntities: [...empty.forecastEntities,
+            ...(data.data.forecastEntities || [])].slice(0, 5) });
         if (data.data.tokenConfigured) loadEntities();
       })
       .catch(() => setMessage('Could not load Home Assistant settings.'));
@@ -111,6 +118,20 @@ export const HomeAssistantSettings = (): JSX.Element => {
           } })} />
         <span>{hint}. Choose from the list or enter an entity ID.</span>
       </InputGroup>)}
+      <div style={{ marginTop: 24 }}>
+        <SettingsHeadline text="Forecast" />
+      </div>
+      <InputGroup>
+        <label htmlFor="ha-forecast-mode">Forecast source</label>
+        <select id="ha-forecast-mode" value={settings.forecastMode}
+          onChange={(event) => setSettings({ ...settings,
+            forecastMode: event.target.value as ForecastMode })}>
+          <option value="weather">Single weather entity</option>
+          <option value="entities">One entity for each day</option>
+          <option value="bom">Bureau of Meteorology forecast sensors</option>
+        </select>
+        <span>Choose a weather entity with daily forecast support, or map each day separately.</span>
+      </InputGroup>
       <InputGroup>
         <label htmlFor="ha-days">Forecast days ahead</label>
         <select id="ha-days" value={settings.days}
@@ -120,6 +141,41 @@ export const HomeAssistantSettings = (): JSX.Element => {
           <option value={5}>5 days</option>
         </select>
       </InputGroup>
+      {settings.forecastMode === 'weather' ? <InputGroup>
+        <label htmlFor="ha-forecast">Daily forecast</label>
+        <input id="ha-forecast" list="ha-weather-entities"
+          placeholder="Weather entity supporting daily forecasts"
+          value={settings.entities.forecast}
+          onChange={(event) => setSettings({ ...settings, entities: {
+            ...settings.entities, forecast: event.target.value,
+          } })} />
+        <span>Choose a weather entity that supports daily forecasts.</span>
+      </InputGroup> : settings.forecastMode === 'bom' ? <InputGroup>
+        <label htmlFor="ha-bom-forecast">BOM maximum temperature for tomorrow</label>
+        <input id="ha-bom-forecast" list="ha-entities"
+          placeholder="sensor.location_temp_max_1"
+          value={settings.bomForecastEntity}
+          onChange={(event) => setSettings({ ...settings,
+            bomForecastEntity: event.target.value })} />
+        <span>
+          Select the T+1 maximum temperature entity ending in _temp_max_1.
+          Matching minimum, icon descriptor and rain chance sensors are found automatically.
+        </span>
+      </InputGroup> : Array.from({ length: settings.days }, (_, index) =>
+        <InputGroup key={index}>
+          <label htmlFor={`ha-forecast-${index}`}>
+            {index === 0 ? 'Tomorrow (T+1)' : `Forecast T+${index + 1}`}
+          </label>
+          <input id={`ha-forecast-${index}`} list="ha-entities"
+            placeholder={`Entity for day ${index + 1}`}
+            value={settings.forecastEntities[index] || ''}
+            onChange={(event) => {
+              const forecastEntities = [...settings.forecastEntities];
+              forecastEntities[index] = event.target.value;
+              setSettings({ ...settings, forecastEntities });
+            }} />
+          <span>Reads common condition, high, low, date and rain probability attributes.</span>
+        </InputGroup>)}
       <Button disabled={saving}>Save weather settings</Button>
       {message && <p role="status">{message}</p>}
     </form>
