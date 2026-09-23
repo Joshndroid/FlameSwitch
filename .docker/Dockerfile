@@ -13,12 +13,17 @@ RUN npm ci --omit=dev
 WORKDIR /app/client
 COPY ./client/package*.json ./
 RUN npm ci
-COPY ./client/ ./
-RUN npm run build
 
-# Final files
+# Copy the application before building the client so no local files can be
+# merged over the generated output afterward. Removing dist also makes this
+# safe if a stale local build ever enters the Docker context.
 WORKDIR /app
 COPY . .
+WORKDIR /app/client
+RUN rm -rf ./dist && npm run build
+
+# Promote only the client output produced by the build above.
+WORKDIR /app
 RUN mkdir -p ./public && mv ./client/dist/* ./public
 RUN rm -rf ./client
 

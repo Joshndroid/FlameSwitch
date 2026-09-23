@@ -7,6 +7,7 @@ const changelog = require('./routes/changelog');
 const version = require('./routes/version');
 const trustProxy = require('./utils/trustProxy');
 const api = express();
+const publicDirectory = join(__dirname, 'public');
 api.set('trust proxy', trustProxy(process.env.TRUST_PROXY));
 
 api.use((_req, res, next) => {
@@ -24,7 +25,13 @@ api.use((_req, res, next) => {
 api.use('/health', healthRoutes);
 
 // Static files
-api.use(express.static(join(__dirname, 'public')));
+api.use(express.static(publicDirectory, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('index.html')) {
+      res.set('Cache-Control', 'no-store');
+    }
+  },
+}));
 api.use(
   '/uploads',
   express.static(join(__dirname, 'data/uploads'), {
@@ -67,7 +74,8 @@ api.use('/app/changelog', changelog);
 api.use('/api/version', version);
 
 api.get(/^\/(?!api)/, (req, res) => {
-  res.sendFile(join(__dirname, 'public/index.html'));
+  res.set('Cache-Control', 'no-store');
+  res.sendFile(join(publicDirectory, 'index.html'));
 });
 
 // Custom error handler
