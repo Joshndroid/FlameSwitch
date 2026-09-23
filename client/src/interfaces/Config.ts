@@ -1,5 +1,6 @@
 export type HomeLayout = 'balanced' | 'stacked' | 'centered';
 export type ContentLayout = 'relaxed' | 'balanced' | 'compact';
+export type WidgetOrder = 'weather-first' | 'fuel-first';
 
 export interface Config {
   customTitle: string;
@@ -30,6 +31,9 @@ export interface Config {
   hideDate: boolean;
   homeLayout: HomeLayout;
   contentLayout: ContentLayout;
+  showWeatherWidget: boolean;
+  showFuelWidget: boolean;
+  widgetOrder: WidgetOrder;
   automaticUpdates?: boolean;
   useDefaults?: boolean;
   updateUrl?: string;

@@ -5,6 +5,7 @@ import { Button, InputGroup, SettingsHeadline } from '../../UI';
 
 type EntityKey = 'inside' | 'outside' | 'rain' | 'shortText' | 'forecast';
 type ForecastMode = 'weather' | 'entities' | 'bom';
+type FuelSource = { name: string; priceEntity: string; stationEntity: string };
 type Settings = {
   url: string;
   tokenConfigured: boolean;
@@ -13,6 +14,7 @@ type Settings = {
   forecastEntities: string[];
   bomForecastEntity: string;
   entities: Record<EntityKey, string>;
+  fuel: { showGraph: boolean; sources: FuelSource[] };
 };
 type Entity = { id: string; name: string; unit: string };
 
@@ -21,6 +23,14 @@ const empty: Settings = {
   forecastEntities: ['', '', '', '', ''],
   bomForecastEntity: '',
   entities: { inside: '', outside: '', rain: '', shortText: '', forecast: '' },
+  fuel: {
+    showGraph: false,
+    sources: [
+      { name: 'Unleaded', priceEntity: '', stationEntity: '' },
+      { name: 'Premium', priceEntity: '', stationEntity: '' },
+      { name: 'Diesel', priceEntity: '', stationEntity: '' },
+    ],
+  },
 };
 const fields: { key: EntityKey; label: string; hint: string }[] = [
   { key: 'outside', label: 'Outside now', hint: 'Temperature sensor or weather entity' },
@@ -52,7 +62,16 @@ export const HomeAssistantSettings = (): JSX.Element => {
         setSettings({ ...empty, ...data.data,
           entities: { ...empty.entities, ...data.data.entities },
           forecastEntities: [...empty.forecastEntities,
-            ...(data.data.forecastEntities || [])].slice(0, 5) });
+            ...(data.data.forecastEntities || [])].slice(0, 5),
+          fuel: {
+            ...empty.fuel,
+            ...(data.data.fuel || {}),
+            sources: empty.fuel.sources.map((fallback, index) => ({
+              ...fallback,
+              ...(data.data.fuel?.sources?.[index] || {}),
+            })),
+          },
+        });
         if (data.data.tokenConfigured) loadEntities();
       })
       .catch(() => setMessage('Could not load Home Assistant settings.'));
@@ -67,7 +86,7 @@ export const HomeAssistantSettings = (): JSX.Element => {
         { ...settings, token }, { headers: applyAuth() });
       setSettings(response.data.data);
       setToken('');
-      setMessage('Saved. The homepage will update shortly.');
+      setMessage('Saved. Refresh the homepage or open a new tab to load fresh data.');
       await loadEntities();
     } catch (error: any) {
       setMessage(error.response?.data?.error || 'Could not save Home Assistant settings.');
@@ -78,8 +97,8 @@ export const HomeAssistantSettings = (): JSX.Element => {
 
   return (
     <form onSubmit={save}>
-      <SettingsHeadline text="Home Assistant weather" />
-      <p>Show a small local weather glance on the homepage. Leave a source blank to hide it.</p>
+      <SettingsHeadline text="Home Assistant" />
+      <p>Connect weather and fuel information widgets to your local Home Assistant.</p>
       <InputGroup>
         <label htmlFor="ha-url">Home Assistant local address</label>
         <input id="ha-url" type="url" required placeholder="http://192.168.1.10:8123"
@@ -176,7 +195,59 @@ export const HomeAssistantSettings = (): JSX.Element => {
             }} />
           <span>Reads common condition, high, low, date and rain probability attributes.</span>
         </InputGroup>)}
-      <Button disabled={saving}>Save weather settings</Button>
+      <div style={{ marginTop: 24 }}>
+        <SettingsHeadline text="Fuel glance" />
+      </div>
+      <p>
+        Add up to three Home Assistant fuel price sensors. Each configured fuel appears as a
+        compact, read-only homepage panel.
+      </p>
+      <InputGroup>
+        <label htmlFor="ha-fuel-graph">Show seven-day price graph</label>
+        <select id="ha-fuel-graph" value={settings.fuel.showGraph ? 1 : 0}
+          onChange={(event) => setSettings({ ...settings, fuel: {
+            ...settings.fuel, showGraph: event.target.value === '1',
+          } })}>
+          <option value={1}>True</option>
+          <option value={0}>False</option>
+        </select>
+        <span>The graph is fetched once and shares the five-minute Home Assistant cache policy.</span>
+      </InputGroup>
+      {settings.fuel.sources.map((source, index) => <div key={index}>
+        <InputGroup>
+          <label htmlFor={`ha-fuel-name-${index}`}>Fuel {index + 1} label</label>
+          <input id={`ha-fuel-name-${index}`} maxLength={40}
+            placeholder={empty.fuel.sources[index].name} value={source.name}
+            onChange={(event) => {
+              const sources = [...settings.fuel.sources];
+              sources[index] = { ...source, name: event.target.value };
+              setSettings({ ...settings, fuel: { ...settings.fuel, sources } });
+            }} />
+        </InputGroup>
+        <InputGroup>
+          <label htmlFor={`ha-fuel-price-${index}`}>Fuel {index + 1} cheapest price</label>
+          <input id={`ha-fuel-price-${index}`} list="ha-entities"
+            placeholder="sensor.cheapest_fuel_price" value={source.priceEntity}
+            onChange={(event) => {
+              const sources = [...settings.fuel.sources];
+              sources[index] = { ...source, priceEntity: event.target.value };
+              setSettings({ ...settings, fuel: { ...settings.fuel, sources } });
+            }} />
+          <span>Leave this blank to hide this fuel.</span>
+        </InputGroup>
+        <InputGroup>
+          <label htmlFor={`ha-fuel-station-${index}`}>Fuel {index + 1} cheapest station</label>
+          <input id={`ha-fuel-station-${index}`} list="ha-entities"
+            placeholder="sensor.cheapest_fuel_station" value={source.stationEntity}
+            onChange={(event) => {
+              const sources = [...settings.fuel.sources];
+              sources[index] = { ...source, stationEntity: event.target.value };
+              setSettings({ ...settings, fuel: { ...settings.fuel, sources } });
+            }} />
+          <span>Optional. Station attributes on the price sensor are also supported.</span>
+        </InputGroup>
+      </div>)}
+      <Button disabled={saving}>Save Home Assistant settings</Button>
       {message && <p role="status">{message}</p>}
     </form>
   );

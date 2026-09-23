@@ -1,4 +1,4 @@
-import { ContentLayout, HomeLayout } from './Config';
+import { ContentLayout, HomeLayout, WidgetOrder } from './Config';
 
 export interface GeneralForm {
   defaultSearchProvider: string;
@@ -26,6 +26,9 @@ export interface UISettingsForm {
   disableAutofocus: boolean;
   homeLayout: HomeLayout;
   contentLayout: ContentLayout;
+  showWeatherWidget: boolean;
+  showFuelWidget: boolean;
+  widgetOrder: WidgetOrder;
 }
 
 export interface DockerSettingsForm {

@@ -19,17 +19,26 @@
   gap: 1rem;
 }
 
+.OverviewStacked > div:last-child {
+  justify-content: flex-start;
+}
+
 .OverviewCentered {
   justify-items: center;
   gap: 1rem;
   text-align: center;
 }
 
+.OverviewCentered > div:last-child {
+  width: 100%;
+  justify-content: center;
+}
+
 .Overview > header {
   min-width: 0;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1000px) {
   .OverviewBalanced {
     grid-template-columns: minmax(0, 1fr);
     justify-items: start;

@@ -50,7 +50,7 @@ export const Settings = (): JSX.Element => {
               Docker
             </NavLink>
             <NavLink to="/settings/home-assistant" className={navClassName}>
-              Weather
+              Home Assistant
             </NavLink>
             <NavLink
               to="/settings/theme"

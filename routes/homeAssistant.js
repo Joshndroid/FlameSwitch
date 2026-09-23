@@ -13,6 +13,16 @@ const fields = ['inside', 'outside', 'rain', 'shortText', 'forecast'];
 const entityIdPattern = /^(sensor|weather)\.[a-z0-9_]+$/;
 const glanceCacheDuration = 5 * 60 * 1000;
 let cache = { key: '', expires: 0, data: null };
+let fuelCache = { key: '', expires: 0, data: null };
+
+const defaultFuel = {
+  showGraph: false,
+  sources: [
+    { name: 'Unleaded', priceEntity: '', stationEntity: '' },
+    { name: 'Premium', priceEntity: '', stationEntity: '' },
+    { name: 'Diesel', priceEntity: '', stationEntity: '' },
+  ],
+};
 
 const readSettings = async () => {
   try {
@@ -84,6 +94,27 @@ const numericValue = (value) => {
   if (value === null || value === undefined || value === '') return null;
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
+};
+
+const fuelSettings = (settings) => ({
+  showGraph: !!settings?.fuel?.showGraph,
+  sources: Array.from({ length: 3 }, (_, index) => {
+    const source = settings?.fuel?.sources?.[index] || defaultFuel.sources[index];
+    return {
+      name: String(source?.name || defaultFuel.sources[index].name).slice(0, 40),
+      priceEntity: String(source?.priceEntity || ''),
+      stationEntity: String(source?.stationEntity || ''),
+    };
+  }),
+});
+
+const historyPoints = (history, entityId) => {
+  if (!Array.isArray(history)) return [];
+  const series = history.find((items) => items?.[0]?.entity_id === entityId) || [];
+  return series.map((item) => ({
+    value: numericValue(item.state),
+    time: item.last_changed || item.last_updated,
+  })).filter((point) => point.value !== null && point.time);
 };
 
 const futureDate = (index, now = new Date()) => {
@@ -176,6 +207,7 @@ router.get('/config', auth, requireAuth, asyncWrapper(async (_req, res) => {
     forecastMode: settings?.forecastMode || 'weather',
     forecastEntities: settings?.forecastEntities || [],
     bomForecastEntity: settings?.bomForecastEntity || '',
+    fuel: fuelSettings(settings),
     tokenConfigured: !!settings?.token,
   } });
 }));
@@ -211,6 +243,18 @@ router.put('/config', auth, requireAuth, asyncWrapper(async (req, res) => {
     (bomForecastEntity && !/^sensor\.[a-z0-9_]+_temp_max_\d+$/.test(bomForecastEntity))) {
     throw new ErrorResponse('Choose a BOM maximum temperature forecast entity', 400);
   }
+  const fuel = req.body.fuel || defaultFuel;
+  if (typeof fuel !== 'object' || Array.isArray(fuel) ||
+    typeof fuel.showGraph !== 'boolean' || !Array.isArray(fuel.sources) ||
+    fuel.sources.length > 3 || fuel.sources.some((source) =>
+      !source || typeof source !== 'object' ||
+      typeof source.name !== 'string' || source.name.length > 40 ||
+      typeof source.priceEntity !== 'string' ||
+      (source.priceEntity && !entityIdPattern.test(source.priceEntity)) ||
+      typeof source.stationEntity !== 'string' ||
+      (source.stationEntity && !entityIdPattern.test(source.stationEntity)))) {
+    throw new ErrorResponse('Choose valid fuel price and station entities', 400);
+  }
   if (typeof token !== 'string' || token.length > 4096 ||
     (!token && !previous?.token)) {
     throw new ErrorResponse('Enter a Home Assistant long-lived access token', 400);
@@ -223,9 +267,11 @@ router.put('/config', auth, requireAuth, asyncWrapper(async (req, res) => {
     forecastMode,
     forecastEntities: [...forecastEntities, '', '', '', '', ''].slice(0, 5),
     bomForecastEntity,
+    fuel: fuelSettings({ fuel }),
   };
   await writeFile(file, JSON.stringify(next), { mode: 0o600 });
   cache = { key: '', expires: 0, data: null };
+  fuelCache = { key: '', expires: 0, data: null };
   res.json({ success: true, data: {
     url: next.url,
     entities,
@@ -233,6 +279,7 @@ router.put('/config', auth, requireAuth, asyncWrapper(async (req, res) => {
     forecastMode,
     forecastEntities: next.forecastEntities,
     bomForecastEntity,
+    fuel: next.fuel,
     tokenConfigured: true,
   } });
 }));
@@ -317,7 +364,61 @@ router.get('/glance', asyncWrapper(async (_req, res) => {
   }
 }));
 
+router.get('/fuel-glance', asyncWrapper(async (_req, res) => {
+  const settings = await readSettings();
+  const fuel = fuelSettings(settings);
+  const configuredSources = fuel.sources.filter(({ priceEntity }) => priceEntity);
+  if (!settings?.url || !settings?.token || !configuredSources.length) {
+    return res.json({ success: true, data: null });
+  }
+
+  const key = JSON.stringify({ url: settings.url, fuel });
+  if (fuelCache.key === key && fuelCache.expires > Date.now()) {
+    return res.json({ success: true, data: fuelCache.data });
+  }
+
+  try {
+    const states = await haRequest(settings, 'states');
+    const byId = Object.fromEntries(states.map((state) => [state.entity_id, state]));
+    let history = [];
+    if (fuel.showGraph) {
+      const now = new Date();
+      const start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const entityIds = configuredSources.map(({ priceEntity }) => priceEntity).join(',');
+      const path = `history/period/${encodeURIComponent(start.toISOString())}` +
+        `?filter_entity_id=${encodeURIComponent(entityIds)}` +
+        `&end_time=${encodeURIComponent(now.toISOString())}&minimal_response&no_attributes`;
+      try {
+        history = await haRequest(settings, path);
+      } catch {
+        // Recorder history is optional; current fuel prices remain useful without it.
+      }
+    }
+
+    const sources = configuredSources.map((source) => {
+      const price = byId[source.priceEntity];
+      const station = byId[source.stationEntity];
+      const attributes = price?.attributes || {};
+      return {
+        name: source.name,
+        price: numericValue(price?.state),
+        unit: String(attributes.unit_of_measurement || 'c/L'),
+        station: station && !['unknown', 'unavailable'].includes(station.state)
+          ? String(station.state)
+          : String(attributes.station_name || attributes.station || ''),
+        history: fuel.showGraph ? historyPoints(history, source.priceEntity) : [],
+      };
+    }).filter(({ price }) => price !== null);
+    const data = sources.length ? { showGraph: fuel.showGraph, sources } : null;
+    fuelCache = { key, expires: Date.now() + glanceCacheDuration, data };
+    res.json({ success: true, data });
+  } catch {
+    throw new ErrorResponse('Home Assistant fuel prices are unavailable', 502);
+  }
+}));
+
 module.exports = router;
 module.exports.isLocalUrl = isLocalUrl;
 module.exports.forecastEntityDay = forecastEntityDay;
 module.exports.bomForecastDay = bomForecastDay;
+module.exports.historyPoints = historyPoints;

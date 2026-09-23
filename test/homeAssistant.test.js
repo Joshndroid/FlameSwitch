@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  isLocalUrl, forecastEntityDay, bomForecastDay,
+  isLocalUrl, forecastEntityDay, bomForecastDay, historyPoints,
 } = require('../routes/homeAssistant');
 
 test('Home Assistant address must be a local IP without redirects or URL extras', () => {
@@ -85,4 +85,17 @@ test('BOM forecast sensors are combined by metric and day suffix', () => {
     unit: '°C',
     rainChance: 60,
   });
+});
+
+test('fuel history keeps numeric readings for the selected entity', () => {
+  const history = [[
+    { entity_id: 'sensor.e10_price', state: '179.9', last_changed: '2026-09-22T00:00:00Z' },
+    { entity_id: 'sensor.e10_price', state: 'unknown', last_changed: '2026-09-22T01:00:00Z' },
+    { entity_id: 'sensor.e10_price', state: '181.5', last_updated: '2026-09-23T00:00:00Z' },
+  ]];
+
+  assert.deepEqual(historyPoints(history, 'sensor.e10_price'), [
+    { value: 179.9, time: '2026-09-22T00:00:00Z' },
+    { value: 181.5, time: '2026-09-23T00:00:00Z' },
+  ]);
 });

@@ -21,6 +21,9 @@ export const uiSettingsTemplate: UISettingsForm = {
   disableAutofocus: false,
   homeLayout: 'balanced',
   contentLayout: 'balanced',
+  showWeatherWidget: true,
+  showFuelWidget: true,
+  widgetOrder: 'weather-first',
 };
 
 export const generalSettingsTemplate: GeneralForm = {

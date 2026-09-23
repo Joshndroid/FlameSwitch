@@ -47,6 +47,9 @@ export const UISettings = (): JSX.Element => {
       ...config,
       homeLayout: config.homeLayout || 'balanced',
       contentLayout: config.contentLayout || 'balanced',
+      showWeatherWidget: config.showWeatherWidget !== false,
+      showFuelWidget: config.showFuelWidget !== false,
+      widgetOrder: config.widgetOrder || 'weather-first',
     });
   }, [loading]);
 
@@ -190,6 +193,34 @@ export const UISettings = (): JSX.Element => {
         >
           <option value={1}>True</option>
           <option value={0}>False</option>
+        </select>
+      </InputGroup>
+
+      <SettingsHeadline text="Information widgets" />
+      <InputGroup>
+        <label htmlFor="showWeatherWidget">Show weather</label>
+        <select id="showWeatherWidget" name="showWeatherWidget"
+          value={formData.showWeatherWidget ? 1 : 0}
+          onChange={(e) => inputChangeHandler(e, { isBool: true })}>
+          <option value={1}>True</option>
+          <option value={0}>False</option>
+        </select>
+      </InputGroup>
+      <InputGroup>
+        <label htmlFor="showFuelWidget">Show fuel glance</label>
+        <select id="showFuelWidget" name="showFuelWidget"
+          value={formData.showFuelWidget ? 1 : 0}
+          onChange={(e) => inputChangeHandler(e, { isBool: true })}>
+          <option value={1}>True</option>
+          <option value={0}>False</option>
+        </select>
+      </InputGroup>
+      <InputGroup>
+        <label htmlFor="widgetOrder">Widget order</label>
+        <select id="widgetOrder" name="widgetOrder" value={formData.widgetOrder}
+          onChange={(e) => inputChangeHandler(e)}>
+          <option value="weather-first">Weather, then fuel</option>
+          <option value="fuel-first">Fuel, then weather</option>
         </select>
       </InputGroup>
 
